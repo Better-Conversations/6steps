@@ -74,10 +74,19 @@ Rails.application.configure do
       port: ENV.fetch("SMTP_PORT", 25)
     }
   else
-    config.action_mailer.delivery_method = :postmark
-    config.action_mailer.postmark_settings = {
-      api_token: ENV.fetch("POSTMARK_API_TOKEN")
-    }
+    postmark_token = ENV["POSTMARK_API_TOKEN"]
+
+    if postmark_token.present?
+      config.action_mailer.delivery_method = :postmark
+      config.action_mailer.postmark_settings = {
+        api_token: postmark_token
+      }
+    elsif ENV["SECRET_KEY_BASE_DUMMY"].present?
+      # Allow asset precompile during image builds without real credentials.
+      config.action_mailer.delivery_method = :test
+    else
+      raise "POSTMARK_API_TOKEN must be set in production when SMTP is not configured"
+    end
   end
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
