@@ -70,23 +70,16 @@ The SafetyMonitor service (`app/services/safety_monitor.rb`) uses DETERMINISTIC 
 
 ## Development Environment
 
-**IMPORTANT:** Always use the devcontainer for running Rails commands. The host machine may have a different Ruby version.
-
-Start the devcontainer from VS Code or Cursor first (use "Reopen in Container"). Once running, execute commands via docker.
-
-**Note:** The container name may vary (e.g., `devcontainer-app-1` vs `six-steps_devcontainer-app-1`). Use `docker ps --filter "name=devcontainer"` to find the correct name.
+**IMPORTANT:** Claude Code runs inside the devcontainer. Run commands directly — do NOT use `docker exec`. The `docker` command is not available inside the container.
 
 ```bash
-# Run commands inside the devcontainer
-docker exec <container> <command>
-
-# Examples:
-docker exec <container> bin/rails db:migrate
-docker exec <container> bin/rails console
+# Run commands directly — you are already inside the devcontainer
+bin/rails db:migrate
+bin/rails console
 
 # IMPORTANT: Always set RAILS_ENV=test when running tests
 # The devcontainer defaults to RAILS_ENV=development
-docker exec -e RAILS_ENV=test <container> bundle exec rspec
+RAILS_ENV=test bundle exec rspec
 ```
 
 ## Testing
@@ -94,30 +87,30 @@ docker exec -e RAILS_ENV=test <container> bundle exec rspec
 ### Run smoke tests first (quick integration check):
 
 ```bash
-docker exec -e RAILS_ENV=test <container> bin/rails smoke_test:all
+RAILS_ENV=test bin/rails smoke_test:all
 ```
 
 ### Run safety tests (critical):
 
 ```bash
-docker exec -e RAILS_ENV=test <container> bundle exec rspec spec/services/safety_monitor_spec.rb
+RAILS_ENV=test bundle exec rspec spec/services/safety_monitor_spec.rb
 ```
 
 ### Run all tests:
 
 ```bash
-docker exec -e RAILS_ENV=test <container> bundle exec rspec
+RAILS_ENV=test bundle exec rspec
 ```
 
 ## Commands
 
 ```bash
-docker exec <container> bin/rails db:migrate           # Run migrations
-docker exec <container> bin/rails server               # Start dev server
-docker exec -e RAILS_ENV=test <container> bundle exec rspec   # Run tests
-docker exec <container> bin/rails console              # Rails console
-docker exec -e RAILS_ENV=test <container> bin/rails smoke_test:all # Integration smoke tests
-docker exec <container> bin/rails db:encryption:init   # Generate encryption keys (if needed)
+bin/rails db:migrate                              # Run migrations
+bin/rails server                                  # Start dev server
+RAILS_ENV=test bundle exec rspec                  # Run tests
+bin/rails console                                 # Rails console
+RAILS_ENV=test bin/rails smoke_test:all           # Integration smoke tests
+bin/rails db:encryption:init                      # Generate encryption keys (if needed)
 ```
 
 ## Important Notes
@@ -201,7 +194,7 @@ If AI features are ever considered, see `COMPLIANCE.md` Section 4 for mandatory 
 
 When adding features that modify models, follow this pattern:
 
-1. **Migration**: Generate with `docker exec devcontainer-app-1 bin/rails generate migration ...`
+1. **Migration**: Generate with `bin/rails generate migration ...`
 2. **Model**: Update model with scopes, validations, and instance methods
 3. **Controller**: Update permitted params if adding new fields
 4. **Views**: Update admin views (index, show, new/edit forms)

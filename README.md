@@ -50,6 +50,7 @@ You're welcome to host this yourself. Start from the `docker-compose.yml` file a
   - Remove `SMTP_ADDRESS` and `SMTP_PORT`, then set `POSTMARK_API_TOKEN` for Postmark delivery, or
   - Configure `SMTP_ADDRESS` and `SMTP_PORT` for your own SMTP server
 - Optionally set `SENTRY_DSN` for error monitoring
+- Optionally set `UMAMI_WEBSITE_ID` for privacy-friendly analytics via [Umami](https://umami.is)
 - Update the admin bootstrap credentials (`ADMIN_EMAIL`, `ADMIN_PASSWORD`)
 
 ## License

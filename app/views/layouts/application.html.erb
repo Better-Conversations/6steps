@@ -19,6 +19,9 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     <%= Sentry.get_trace_propagation_meta.html_safe if defined?(Sentry) && Sentry.initialized? %>
+    <% if ENV['UMAMI_WEBSITE_ID'].present? %>
+      <script defer src="https://umami.betterconversations.foundation/script.js" data-website-id="<%= ENV['UMAMI_WEBSITE_ID'] %>"></script>
+    <% end %>
   </head>
 
   <body class="h-full bg-slate-50 text-slate-900 antialiased flex flex-col">

@@ -52,6 +52,8 @@ services:
       - ADMIN_EMAIL=admin@localhost
       - ADMIN_PASSWORD=change_me_immediately
       - ADMIN_REGION=uk
+      # Analytics (optional)
+      # - UMAMI_WEBSITE_ID=your-website-id
     volumes:
       - rails_storage:/rails/storage
     restart: unless-stopped
