@@ -81,3 +81,6 @@ end
 
 gem "sentry-ruby"
 gem "sentry-rails"
+
+# Email delivery via Postmark
+gem "postmark-rails"
