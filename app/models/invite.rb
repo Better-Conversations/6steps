@@ -150,12 +150,12 @@ class Invite < ApplicationRecord
 
     # Build the host:port string if port is present and not already in host
     host_with_port = if host.include?("://")
-                       host
-                     elsif port.present? && !host.include?(":")
-                       "#{protocol}://#{host}:#{port}"
-                     else
-                       "#{protocol}://#{host}"
-                     end
+      host
+    elsif port.present? && !host.include?(":")
+      "#{protocol}://#{host}:#{port}"
+    else
+      "#{protocol}://#{host}"
+    end
 
     "#{host_with_port}/users/sign_up?invite=#{token}"
   end

@@ -6,15 +6,15 @@
 
 This application is subject to UK/EU GDPR and designed to avoid EU AI Act classification. The following changes **REQUIRE compliance review before implementation**:
 
-| Change Type | Risk Level | Action Required |
-|-------------|------------|-----------------|
-| Adding AI/ML components | **CRITICAL** | Full EU AI Act assessment required |
-| Modifying `SafetyMonitor` patterns | **HIGH** | Safety review + exhaustive testing |
-| Changing depth thresholds | **HIGH** | Safety review + documentation |
-| Adding new data collection | **HIGH** | DPO review for GDPR impact |
-| Modifying consent types | **HIGH** | Legal review |
-| Changing data retention | **MEDIUM** | DPO review |
-| Adding health/therapeutic claims | **CRITICAL** | Medical device regulation risk |
+| Change Type                        | Risk Level   | Action Required                    |
+| ---------------------------------- | ------------ | ---------------------------------- |
+| Adding AI/ML components            | **CRITICAL** | Full EU AI Act assessment required |
+| Modifying `SafetyMonitor` patterns | **HIGH**     | Safety review + exhaustive testing |
+| Changing depth thresholds          | **HIGH**     | Safety review + documentation      |
+| Adding new data collection         | **HIGH**     | DPO review for GDPR impact         |
+| Modifying consent types            | **HIGH**     | Legal review                       |
+| Changing data retention            | **MEDIUM**   | DPO review                         |
+| Adding health/therapeutic claims   | **CRITICAL** | Medical device regulation risk     |
 
 **DO NOT** implement any of the above without explicit authorization.
 
@@ -47,6 +47,7 @@ Six Steps is a Rails 8.0+ application offering quiet spaces for self-reflection,
 ### Safety-First Design
 
 The SafetyMonitor service (`app/services/safety_monitor.rb`) uses DETERMINISTIC pattern matching, not AI:
+
 - All crisis detection is via regex patterns
 - Depth scores are calculated from word counts
 - This ensures testable, auditable, predictable behaviour
@@ -91,16 +92,19 @@ docker exec -e RAILS_ENV=test <container> bundle exec rspec
 ## Testing
 
 ### Run smoke tests first (quick integration check):
+
 ```bash
 docker exec -e RAILS_ENV=test <container> bin/rails smoke_test:all
 ```
 
 ### Run safety tests (critical):
+
 ```bash
 docker exec -e RAILS_ENV=test <container> bundle exec rspec spec/services/safety_monitor_spec.rb
 ```
 
 ### Run all tests:
+
 ```bash
 docker exec -e RAILS_ENV=test <container> bundle exec rspec
 ```
@@ -133,6 +137,7 @@ docker exec <container> bin/rails db:encryption:init   # Generate encryption key
 ### Invite System
 
 Public registration is disabled. Users can only register with a valid invite link:
+
 - Invites created by admins at `/admin/invites`
 - Invite URL format: `/users/sign_up?invite=TOKEN`
 - **Single-use invites**: Default, one person per invite, optional email restriction
@@ -163,17 +168,18 @@ bin/rails runner 'User.find_by(email: "user@example.com").update!(role: :admin)'
 
 The following files have regulatory implications - modifications require compliance review:
 
-| File | Compliance Area |
-|------|-----------------|
-| `app/services/safety_monitor.rb` | Crisis detection - user safety |
-| `app/jobs/data_retention_job.rb` | GDPR data minimization |
-| `app/models/consent.rb` | GDPR lawful basis |
-| `app/controllers/users/registrations_controller.rb` | GDPR data portability/erasure |
-| `config/locales/*.yml` | "Not professional support" disclaimers |
+| File                                                | Compliance Area                        |
+| --------------------------------------------------- | -------------------------------------- |
+| `app/services/safety_monitor.rb`                    | Crisis detection - user safety         |
+| `app/jobs/data_retention_job.rb`                    | GDPR data minimization                 |
+| `app/models/consent.rb`                             | GDPR lawful basis                      |
+| `app/controllers/users/registrations_controller.rb` | GDPR data portability/erasure          |
+| `config/locales/*.yml`                              | "Not professional support" disclaimers |
 
 ## Why No AI
 
 The system deliberately uses **deterministic rule-based processing** to:
+
 1. Avoid EU AI Act High-Risk classification (Annex III, Section 5)
 2. Ensure fully auditable, predictable behaviour
 3. Enable exhaustive safety testing
@@ -189,6 +195,7 @@ If AI features are ever considered, see `COMPLIANCE.md` Section 4 for mandatory 
 2. Branch naming: `username/BCTT-XXX-short-description`
 3. Commit frequently with meaningful messages
 4. Don't commit to main directly
+5. **YOU MUST** Make sure `bin/brakeman --no-pager` and `bin/importmap audit` and `bin/rubocop -f github` all pass before committing.
 
 ### Implementation Steps
 
@@ -209,6 +216,7 @@ Stimulus controllers are auto-loaded from `app/javascript/controllers/`. Name fi
 ### Factories
 
 Use traits to represent different object states:
+
 ```ruby
 trait :multi_use do
   multi_use { true }
@@ -221,12 +229,12 @@ end
 
 ## Documentation
 
-| Document | Purpose |
-|----------|---------|
-| [README.md](README.md) | Quick start and overview |
-| [COMPLIANCE.md](COMPLIANCE.md) | Regulatory requirements (GDPR, EU AI Act) |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design and data flow |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Hosting and deployment |
-| [docs/ADMINISTRATION.md](docs/ADMINISTRATION.md) | User roles and management |
-| [docs/TESTING.md](docs/TESTING.md) | Test commands and categories |
-| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common issues and solutions |
+| Document                                           | Purpose                                   |
+| -------------------------------------------------- | ----------------------------------------- |
+| [README.md](README.md)                             | Quick start and overview                  |
+| [COMPLIANCE.md](COMPLIANCE.md)                     | Regulatory requirements (GDPR, EU AI Act) |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)       | System design and data flow               |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)           | Hosting and deployment                    |
+| [docs/ADMINISTRATION.md](docs/ADMINISTRATION.md)   | User roles and management                 |
+| [docs/TESTING.md](docs/TESTING.md)                 | Test commands and categories              |
+| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common issues and solutions               |
