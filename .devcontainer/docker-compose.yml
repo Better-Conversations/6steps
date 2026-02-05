@@ -11,6 +11,10 @@ services:
     environment:
       - RAILS_ENV=development
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/six_steps_development
+      # Admin bootstrap (only used when User.count == 0, via db:seed or admin:create_initial)
+      - ADMIN_EMAIL=admin@localhost
+      - ADMIN_PASSWORD=password123
+      - ADMIN_REGION=uk
     depends_on:
       db:
         condition: service_healthy
