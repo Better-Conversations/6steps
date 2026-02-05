@@ -60,8 +60,9 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates and invite URLs.
   # Configure via APPLICATION_HOST environment variable.
   config.action_mailer.default_url_options = {
-    host: ENV.fetch("APPLICATION_HOST", "6steps.online"),
-    protocol: "https"
+    host: ENV.fetch("APPLICATION_HOST", "localhost"),
+    port: ENV.fetch("APPLICATION_PORT", nil),
+    protocol: ENV.fetch("APPLICATION_PROTOCOL", "https")
   }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via rails credentials:edit.
