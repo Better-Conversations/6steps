@@ -39,6 +39,7 @@ gem "prawn"
 gem "prawn-table"
 gem "matrix"  # Required by prawn for Ruby 3.1+
 gem "gemoji"  # For emoji short code lookup in PDF export
+gem "ostruct" # Ruby 3.5+ removes ostruct from default gems
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
