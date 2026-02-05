@@ -35,6 +35,17 @@ class Users::RegistrationsController < Devise::RegistrationsController
     super do |resource|
       if resource.persisted? && @invite
         @invite.mark_used!(resource)
+
+        # Track signup in Sentry
+        Sentry.capture_message(
+          "New user signup",
+          level: :info,
+          extra: {
+            user_id: resource.id,
+            region: resource.region,
+            invite_type: @invite.multi_use? ? "general_link" : "single_use"
+          }
+        )
       end
     end
   end
