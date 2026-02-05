@@ -1,0 +1,546 @@
+# Compliance Documentation
+
+## Six Steps - Regulatory Compliance Status
+
+**Last Updated:** 2025-01-30
+**Version:** 1.0
+**Review Frequency:** Annually or upon significant changes
+
+---
+
+## 1. Regulatory Classification
+
+### EU AI Act (Regulation 2024/1689)
+
+**Status: NOT APPLICABLE**
+
+Six Steps uses **deterministic rule-based processing**, not artificial intelligence:
+
+| Component | Implementation | AI Classification |
+|-----------|---------------|-------------------|
+| SafetyMonitor | Regex pattern matching, word counting | NOT AI |
+| QuestionGenerator | Template substitution | NOT AI |
+| ConversationEngine | AASM state machine | NOT AI |
+| Depth Scoring | Threshold-based rules | NOT AI |
+
+**Why this matters:**
+- No machine learning models
+- No neural networks or trained algorithms
+- No inference or prediction systems
+- Fully deterministic and auditable behaviour
+- Same input always produces same output
+
+**Documentation requirement:** If AI features are ever added (e.g., LLM integration), immediate reclassification as **High-Risk AI System** under Annex III, Section 5 ("AI systems intended to evaluate the mental state of natural persons") would be required.
+
+### UK/EU GDPR
+
+**Status: COMPLIANT**
+
+Six Steps processes sensitive personal data (special category under Article 9) and implements:
+
+| Requirement | Implementation | Status |
+|-------------|---------------|--------|
+| Lawful basis (Article 6) | Explicit consent | ✅ |
+| Special category data (Article 9) | Explicit consent for sensitive data processing | ✅ |
+| Right to access (Article 15) | GDPR export endpoint | ✅ |
+| Right to erasure (Article 17) | Account deletion with cascade | ✅ |
+| Right to portability (Article 20) | JSON data export | ✅ |
+| Data minimization (Article 5) | 30-day content redaction | ✅ |
+| Security (Article 32) | AES-256 encryption, TLS | ✅ |
+| Records of processing (Article 30) | PaperTrail audit logs | ✅ |
+
+### UK Medical Device Regulations
+
+**Status: NOT A MEDICAL DEVICE**
+
+Six Steps is explicitly positioned as a self-reflection tool, not a substitute for professional coaching, counselling, or therapy:
+
+- Clear "not professional support" disclaimers throughout the application
+- No diagnostic claims
+- No treatment recommendations
+- No therapeutic outcomes promised
+- Signposting to appropriate professional help when needed
+
+**Boundary maintained by:**
+- Welcome screen disclaimer
+- Terms of service
+- Session consent before each use
+- Footer reminder on all screens
+- Automatic resource display when depth increases
+
+### HIPAA (US)
+
+**Status: DESIGNED FOR COMPLIANCE**
+
+If deployed for US users with PHI:
+
+| Safeguard | Implementation |
+|-----------|---------------|
+| Access controls | Role-based authentication, invite-only registration |
+| Audit controls | PaperTrail, SafetyAuditLog |
+| Integrity controls | Database constraints, encrypted fields |
+| Transmission security | TLS 1.3 required |
+| Encryption | AES-256 at rest via Active Record Encryption |
+
+**Note:** Full HIPAA compliance requires additional administrative safeguards (BAAs, policies) beyond technical implementation.
+
+---
+
+## 2. Data Protection Implementation
+
+### Consent Management
+
+**Required consents before session start:**
+1. `terms_of_service` - General terms of use
+2. `privacy_policy` - Privacy policy acceptance
+3. `sensitive_data_processing` - GDPR Article 9 explicit consent
+4. `session_reflections` - Understanding of data handling
+
+**Consent features:**
+- Versioned consents (tracks policy version accepted)
+- Withdrawal capability (GDPR right)
+- Consent expiry detection (for renewal when terms change)
+- Full audit trail via PaperTrail
+
+### Data Retention Policy
+
+| Data Type | Retention Period | Action |
+|-----------|-----------------|--------|
+| User account | Until deletion requested | Preserved |
+| Consent records | Permanent | Preserved (legal requirement) |
+| Session metadata | Permanent | Preserved |
+| Session content | 30 days | Redacted to "[REDACTED]" |
+| Safety audit logs | Permanent | Preserved (anonymized) |
+
+**Implementation:** `DataRetentionJob` runs daily to redact content older than 30 days.
+
+**Redacted fields:**
+- `SessionIteration.user_response`
+- `SessionIteration.question_asked`
+- `SessionIteration.reflected_words`
+- `JourneySession.pending_question`
+- `JourneySession.reflected_words_cache`
+
+### Encryption
+
+| Layer | Method |
+|-------|--------|
+| At rest | Rails Active Record Encryption (AES-256-GCM) |
+| In transit | TLS 1.3 |
+| Backups | Encrypted backup storage |
+
+**Encrypted fields:**
+- `JourneySession.current_space`
+- `JourneySession.pending_question`
+- `JourneySession.reflected_words_cache`
+- `JourneySession.session_summary`
+- `SessionIteration.question_asked`
+- `SessionIteration.user_response`
+- `SessionIteration.reflected_words`
+
+### GDPR Data Subject Rights
+
+| Right | Endpoint | Implementation |
+|-------|----------|---------------|
+| Access | GET /users/export_data.json | Full JSON export |
+| Erasure | DELETE /users | Cascade deletion |
+| Portability | GET /users/export_data.json | Structured JSON |
+| Rectification | PUT /users | Account settings |
+| Withdraw consent | POST /consents/withdraw | Consent management |
+
+---
+
+## 3. Safety System Documentation
+
+### Crisis Detection (Deterministic)
+
+The safety system uses **regex pattern matching** with two tiers:
+
+**Immediate Risk Patterns:**
+```
+suicide, suicidal, kill myself, end it all, don't want to live
+hurt myself, self-harm, cut myself
+pills, overdose, method, plan to
+```
+
+**Elevated Risk Patterns:**
+```
+no point, no hope, hopeless, worthless, burden
+can't go on, can't cope, can't take it
+want to die, rather be dead
+```
+
+### Depth Score Thresholds
+
+| Score Range | Level | Response |
+|-------------|-------|----------|
+| 0.0 - 0.3 | GREEN | Continue normally |
+| 0.3 - 0.5 | AMBER | Insert grounding question |
+| 0.5 - 0.7 | AMBER-RED | Suggest pause, show resources |
+| 0.7 - 0.9 | RED | Redirect to integration phase |
+| 0.9+ | DEEP RED | Show resources |
+
+### Safety Audit Logging
+
+All safety events are logged with:
+- Event type
+- Anonymized trigger data (pattern type, not content)
+- Depth score snapshot
+- Response taken
+- Timestamp
+- Session reference
+
+**Event types:**
+- `crisis_pattern_detected`
+- `crisis_protocol_activated`
+- `depth_threshold_crossed`
+- `grounding_inserted`
+- `session_paused`
+- `session_redirected`
+
+---
+
+## 4. Change Review Requirements
+
+### Changes Requiring Compliance Review
+
+The following changes **MUST** trigger a compliance review before deployment:
+
+#### HIGH PRIORITY (Requires full review)
+
+| Change Type | Review Required | Reason |
+|-------------|-----------------|--------|
+| Adding AI/ML components | Full regulatory reassessment | EU AI Act reclassification |
+| Modifying crisis patterns | Safety team + safety review | User safety |
+| Changing depth thresholds | Safety team + safety review | Intervention timing |
+| Adding new data collection | DPO review | GDPR impact |
+| Changing consent types | Legal + DPO review | Lawful basis |
+| Modifying data retention | DPO review | Minimization compliance |
+| Adding health claims | Legal + regulatory review | Medical device risk |
+
+#### MEDIUM PRIORITY (Requires documented review)
+
+| Change Type | Review Required | Reason |
+|-------------|-----------------|--------|
+| New user-facing text | Content review | Disclaimer maintenance |
+| Authentication changes | Security review | Access control |
+| Adding new regions | Resource verification | Crisis helpline accuracy |
+| Export format changes | DPO review | Portability compliance |
+| Encryption changes | Security review | Data protection |
+
+#### LOW PRIORITY (Standard code review)
+
+| Change Type | Review Required | Reason |
+|-------------|-----------------|--------|
+| UI/UX improvements | Standard review | User experience |
+| Performance optimization | Standard review | No compliance impact |
+| Bug fixes (non-safety) | Standard review | Maintenance |
+| Documentation updates | Standard review | Accuracy |
+
+### Adding AI Features - Required Steps
+
+If AI/ML is ever added to Six Steps, the following steps are **mandatory**:
+
+1. **Stop deployment** - No release until compliance achieved
+
+2. **EU AI Act Classification**
+   - Classify under Annex III (likely High-Risk, Section 5)
+   - Complete conformity assessment
+   - Register in EU AI database
+
+3. **Technical Requirements (High-Risk)**
+   - Risk management system (Article 9)
+   - Data governance framework (Article 10)
+   - Technical documentation (Article 11)
+   - Automatic logging capability (Article 12)
+   - Transparency documentation (Article 13)
+   - Human oversight mechanisms (Article 14)
+   - Accuracy/robustness testing (Article 15)
+
+4. **Documentation Updates**
+   - Update this compliance document
+   - Create AI-specific risk assessment
+   - Document training data and methodology
+   - Create bias assessment
+
+5. **Ongoing Requirements**
+   - Post-market monitoring
+   - Serious incident reporting
+   - Annual compliance audits
+
+### Algorithm Changes - Required Steps
+
+Any modification to safety algorithms requires:
+
+1. **Pre-deployment:**
+   - Document proposed change
+   - Run exhaustive SafetyMonitor test suite
+   - Session reviewer sign-off
+   - Update threshold documentation
+
+2. **Testing:**
+   - All 80+ existing safety tests must pass
+   - Add new tests for any new patterns
+   - False positive/negative analysis
+   - Boundary condition testing
+
+3. **Deployment:**
+   - Staged rollout
+   - Monitor safety metrics
+   - 24-hour observation period
+
+4. **Post-deployment:**
+   - Update this compliance document
+   - Log change in audit trail
+   - Review safety metrics after 7 days
+
+---
+
+## 5. Security Measures
+
+### Authentication
+
+| Measure | Implementation |
+|---------|---------------|
+| Password requirements | Devise defaults (minimum 6 characters) |
+| Session management | Secure cookies, CSRF protection |
+| Access control | Role-based (user, session_reviewer, admin) |
+| Registration | Invite-only (public registration disabled) |
+
+### Infrastructure Security
+
+| Measure | Implementation |
+|---------|---------------|
+| Firewall | UFW configured |
+| Brute force protection | Fail2ban |
+| SSL/TLS | Let's Encrypt certificates |
+| Dependency scanning | Brakeman (0 warnings) |
+
+### Audit Trail
+
+| System | Purpose |
+|--------|---------|
+| PaperTrail | Model change history |
+| SafetyAuditLog | Safety event logging |
+| Rails logs | Application events |
+
+---
+
+## 6. Session Oversight
+
+### Session Reviewer Role
+
+Session reviewers can access:
+- Anonymized session patterns
+- Safety trigger frequencies
+- Depth score distributions
+- Intervention effectiveness metrics
+
+Session reviewers **cannot** access:
+- User identity
+- Verbatim user content
+- Personal identifying information
+
+### Threshold Adjustment Process
+
+1. Session reviewer proposes adjustment
+2. Change documented with rationale
+3. Admin approval required
+4. Full test suite run
+5. Staged deployment
+6. 7-day monitoring period
+
+---
+
+## 7. Data Breach Notification Procedure
+
+### GDPR Article 33 Requirements
+
+Personal data breaches must be reported to the ICO within **72 hours** of discovery.
+
+### What Constitutes a Breach
+
+- Unauthorized access to user data
+- Accidental disclosure of personal data
+- Loss of unencrypted backup
+- Compromised database credentials
+- Ransomware affecting user data
+
+### Breach Response Procedure
+
+#### Step 1: Immediate Containment (0-2 hours)
+1. Isolate affected systems
+2. Preserve evidence (logs, access records)
+3. Change compromised credentials
+4. Notify Technical Lead and Data Controller
+
+#### Step 2: Assessment (2-24 hours)
+1. Determine scope of breach
+2. Identify affected data types
+3. Count affected individuals
+4. Assess risk to data subjects
+
+#### Step 3: ICO Notification (Within 72 hours)
+1. Complete ICO breach report form
+2. Include: nature of breach, categories of data, approximate numbers, likely consequences, mitigation measures
+3. Submit via: https://ico.org.uk/for-organisations/report-a-breach/
+
+#### Step 4: User Notification (If Required)
+If breach poses high risk to users' rights and freedoms:
+1. Notify affected users without undue delay
+2. Explain: what happened, what data affected, what we're doing, what they should do
+3. Provide Data Controller contact
+
+#### Step 5: Post-Incident Review (Within 7 days)
+1. Document full timeline
+2. Identify root cause
+3. Implement preventive measures
+4. Update this document if needed
+
+### ICO Contact Information
+
+- **Online:** https://ico.org.uk/for-organisations/report-a-breach/
+- **Phone:** 0303 123 1113
+- **Hours:** Monday to Friday, 9am to 5pm
+
+### Breach Log Template
+
+| Field | Value |
+|-------|-------|
+| Date discovered | |
+| Date occurred (if different) | |
+| Description | |
+| Data types affected | |
+| Number of individuals | |
+| Risk assessment | Low / Medium / High |
+| ICO notified | Yes / No / Not required |
+| Users notified | Yes / No / Not required |
+| Root cause | |
+| Preventive measures | |
+
+---
+
+## 8. Crisis Resource Verification Schedule
+
+### User Safety Requirement
+
+Crisis helpline numbers and URLs must be verified quarterly to ensure users in distress can reach help.
+
+### Verification Schedule
+
+| Quarter | Deadline | Verified By | Date Completed |
+|---------|----------|-------------|----------------|
+| Q1 2025 | March 31, 2025 | | |
+| Q2 2025 | June 30, 2025 | | |
+| Q3 2025 | September 30, 2025 | | |
+| Q4 2025 | December 31, 2025 | | |
+
+### Verification Checklist
+
+For each region (UK, US, EU, AU), verify:
+
+#### UK Resources
+- [ ] Samaritans (116 123) - Call connects
+- [ ] NHS 111 - Call connects
+- [ ] Mind helpline - Call connects
+- [ ] https://www.samaritans.org - Loads correctly
+- [ ] https://www.mind.org.uk - Loads correctly
+
+#### US Resources
+- [ ] 988 Suicide & Crisis Lifeline - Call connects
+- [ ] Crisis Text Line (741741) - Text receives response
+- [ ] NAMI Helpline - Call connects
+- [ ] https://988lifeline.org - Loads correctly
+
+#### EU Resources
+- [ ] 112 Emergency - Documented as available
+- [ ] Country-specific resources verified
+
+#### AU Resources
+- [ ] Lifeline (13 11 14) - Call connects
+- [ ] Beyond Blue - Call connects
+- [ ] https://www.lifeline.org.au - Loads correctly
+
+### Updating Crisis Resources
+
+1. Document the change needed
+2. Get safety reviewer sign-off
+3. Update `app/services/crisis_resources.rb`
+4. Run full test suite
+5. Deploy with monitoring
+
+**File location:** `app/services/crisis_resources.rb`
+
+---
+
+## 9. Compliance Verification
+
+### Automated Checks
+
+| Check | Frequency | Tool |
+|-------|-----------|------|
+| Security scan | Weekly | Brakeman |
+| Safety tests | Every commit | RSpec |
+| Smoke tests | Every deployment | bin/rails smoke_test:all |
+
+### Manual Reviews
+
+| Review | Frequency | Responsibility |
+|--------|-----------|----------------|
+| Compliance document | Annually | DPO/Legal |
+| Safety thresholds | Quarterly | Safety team |
+| Crisis resources | Quarterly | Safety team |
+| Consent wording | On policy change | Legal |
+
+### Audit Checklist
+
+- [ ] All safety tests passing
+- [ ] Brakeman shows 0 warnings
+- [ ] Data retention job running daily
+- [ ] Consent versions current
+- [ ] Crisis resources verified for all regions
+- [ ] Encryption keys rotated annually
+- [ ] Backup restoration tested
+- [ ] Access logs reviewed
+
+---
+
+## 10. Contact Information
+
+| Role | Responsibility |
+|------|----------------|
+| Data Protection Officer | GDPR compliance, data subject requests |
+| Safety Lead | Safety threshold oversight |
+| Technical Lead | Implementation compliance |
+| Legal Counsel | Regulatory interpretation |
+
+---
+
+## 11. Document History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2025-01-30 | Initial compliance documentation |
+| 1.1 | 2025-01-30 | Added breach notification procedure (Section 7) |
+| 1.2 | 2025-01-30 | Added crisis resource verification schedule (Section 8) |
+
+---
+
+## Appendix A: Regulatory References
+
+- **EU AI Act:** Regulation (EU) 2024/1689
+- **UK GDPR:** UK General Data Protection Regulation
+- **EU GDPR:** Regulation (EU) 2016/679
+- **HIPAA:** Health Insurance Portability and Accountability Act of 1996
+- **UK MDR:** Medical Devices Regulations 2002 (as amended)
+- **EU MDR:** Regulation (EU) 2017/745
+
+## Appendix B: Key Files
+
+| File | Purpose |
+|------|---------|
+| `app/services/safety_monitor.rb` | Crisis detection patterns |
+| `app/jobs/data_retention_job.rb` | 30-day content redaction |
+| `app/models/consent.rb` | Consent management |
+| `app/models/safety_audit_log.rb` | Safety event logging |
+| `spec/services/safety_monitor_spec.rb` | Safety test suite |

@@ -1,0 +1,133 @@
+<% content_for :title, "Six Steps - Quiet spaces for reflection" %>
+
+<div class="max-w-4xl mx-auto">
+  <!-- Hero section -->
+  <div class="text-center py-12 sm:py-16">
+    <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
+      Six Steps
+    </h1>
+    <p class="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
+      Quiet spaces to step into for self-reflection.
+    </p>
+
+    <% if user_signed_in? %>
+      <%= link_to dashboard_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 shadow-sm" do %>
+        Go to Dashboard
+        <svg class="ml-2 -mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+      <% end %>
+    <% else %>
+      <%= link_to "Learn More", about_path, class: "inline-flex items-center justify-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500" %>
+    <% end %>
+  </div>
+
+  <!-- Disclaimer box -->
+  <div class="mb-12">
+    <%= render "shared/disclaimer" %>
+  </div>
+
+  <!-- How it works -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-12">
+    <h2 class="text-2xl font-semibold text-slate-900 mb-6 text-center">How It Works</h2>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="text-center">
+        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span class="text-blue-600 font-semibold">1</span>
+        </div>
+        <h3 class="font-medium text-slate-900 mb-2">Step into a Space</h3>
+        <p class="text-slate-600 text-sm">
+          Choose a quiet space to explore: here, there, before, after, inside, or outside.
+        </p>
+      </div>
+
+      <div class="text-center">
+        <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span class="text-indigo-600 font-semibold">2</span>
+        </div>
+        <h3 class="font-medium text-slate-900 mb-2">Reflect</h3>
+        <p class="text-slate-600 text-sm">
+          Respond to gentle questions that help you notice and explore your experience.
+        </p>
+      </div>
+
+      <div class="text-center">
+        <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span class="text-amber-600 font-semibold">3</span>
+        </div>
+        <h3 class="font-medium text-slate-900 mb-2">Integrate</h3>
+        <p class="text-slate-600 text-sm">
+          Discover what you know now that you didn't know before.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key features -->
+  <div class="grid md:grid-cols-2 gap-6 mb-12">
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
+        <div class="ml-4">
+          <h3 class="font-medium text-slate-900">Safe & Private</h3>
+          <p class="text-slate-600 text-sm mt-1">
+            Your reflections are encrypted and never shared. Built-in safety measures if you need support.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div class="ml-4">
+          <h3 class="font-medium text-slate-900">Bounded Sessions</h3>
+          <p class="text-slate-600 text-sm mt-1">
+            Each session is limited to 6 questions and 30 minutes, keeping reflection contained and manageable.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <svg class="w-6 h-6 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </div>
+        <div class="ml-4">
+          <h3 class="font-medium text-slate-900">Your Words</h3>
+          <p class="text-slate-600 text-sm mt-1">
+            Questions reflect your own language back to you, honouring your unique experience.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+        <div class="ml-4">
+          <h3 class="font-medium text-slate-900">Track Your Journey</h3>
+          <p class="text-slate-600 text-sm mt-1">
+            View past sessions and export reflections as PDF to support your ongoing journey.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

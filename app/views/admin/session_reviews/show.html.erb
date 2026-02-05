@@ -1,0 +1,180 @@
+<% content_for :title, "Review Session ##{@session.id} - Six Steps Admin" %>
+
+<div class="mb-8">
+  <%= link_to "&larr; Back to Reviews".html_safe, admin_session_reviews_path, class: "text-sm text-violet-600 hover:text-violet-700" %>
+</div>
+
+<div class="flex justify-between items-start mb-8">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900">Session #<%= @session.id %></h1>
+    <p class="text-slate-600">Anonymized session review</p>
+  </div>
+  <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium <%= session_state_class(@session.state) %>">
+    <%= @session.state.titleize %>
+  </span>
+</div>
+
+<!-- Session overview -->
+<div class="grid lg:grid-cols-3 gap-6 mb-8">
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <h3 class="text-sm font-medium text-slate-500 mb-2">Session Details</h3>
+    <dl class="space-y-2">
+      <div>
+        <dt class="text-xs text-slate-400">Created</dt>
+        <dd class="text-sm text-slate-900"><%= @session.created_at.strftime("%B %d, %Y at %H:%M") %></dd>
+      </div>
+      <div>
+        <dt class="text-xs text-slate-400">Space Explored</dt>
+        <dd class="text-sm text-slate-900"><%= @session.current_space&.titleize || "Not selected" %></dd>
+      </div>
+      <div>
+        <dt class="text-xs text-slate-400">Iterations</dt>
+        <dd class="text-sm text-slate-900"><%= @session.iteration_count %> of 6</dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <h3 class="text-sm font-medium text-slate-500 mb-2">Safety Metrics</h3>
+    <dl class="space-y-2">
+      <div>
+        <dt class="text-xs text-slate-400">Final Depth Score</dt>
+        <dd>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium <%= depth_level_class(@session.current_depth_score) %>">
+            <%= ((@session.current_depth_score || 0) * 100).round %>%
+          </span>
+        </dd>
+      </div>
+      <div>
+        <dt class="text-xs text-slate-400">Grounding Insertions</dt>
+        <dd class="text-sm text-slate-900"><%= @session.grounding_insertions_count %></dd>
+      </div>
+      <div>
+        <dt class="text-xs text-slate-400">Safety Events</dt>
+        <dd class="text-sm text-slate-900"><%= @audit_logs.count %></dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <h3 class="text-sm font-medium text-slate-500 mb-2">Timing</h3>
+    <dl class="space-y-2">
+      <div>
+        <dt class="text-xs text-slate-400">Started</dt>
+        <dd class="text-sm text-slate-900"><%= @session.started_at&.strftime("%H:%M") || "—" %></dd>
+      </div>
+      <div>
+        <dt class="text-xs text-slate-400">Duration</dt>
+        <dd class="text-sm text-slate-900">
+          <% if @session.started_at %>
+            <%= distance_of_time_in_words(@session.started_at, @session.updated_at) %>
+          <% else %>
+            —
+          <% end %>
+        </dd>
+      </div>
+      <div>
+        <dt class="text-xs text-slate-400">Time Limit Warning</dt>
+        <dd class="text-sm text-slate-900"><%= @session.soft_time_limit_warned? ? "Yes" : "No" %></dd>
+      </div>
+    </dl>
+  </div>
+</div>
+
+<!-- Safety audit log -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+  <h2 class="text-lg font-semibold text-slate-900 mb-4">Safety Audit Log</h2>
+
+  <% if @audit_logs.any? %>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead>
+          <tr>
+            <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Time</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Event</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Depth Score</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Response</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Trigger (Anonymized)</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+          <% @audit_logs.each do |log| %>
+            <tr>
+              <td class="px-4 py-3 text-sm text-slate-500">
+                <%= log.created_at.strftime("%H:%M:%S") %>
+              </td>
+              <td class="px-4 py-3 text-sm">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+                  <% case log.event_type.to_s %>
+                  <% when 'crisis_detected' %>
+                    bg-purple-100 text-purple-800
+                  <% when 'elevated_depth', 'threshold_breached' %>
+                    bg-orange-100 text-orange-800
+                  <% when 'grounding_inserted' %>
+                    bg-violet-100 text-violet-800
+                  <% when 'pause_suggested' %>
+                    bg-amber-100 text-amber-800
+                  <% else %>
+                    bg-slate-100 text-slate-800
+                  <% end %>">
+                  <%= log.event_type.to_s.titleize %>
+                </span>
+              </td>
+              <td class="px-4 py-3 text-sm text-slate-900">
+                <%= ((log.depth_score_snapshot || 0) * 100).round %>%
+              </td>
+              <td class="px-4 py-3 text-sm text-slate-500">
+                <%= log.response_taken || "—" %>
+              </td>
+              <td class="px-4 py-3 text-sm text-slate-500">
+                <% if log.trigger_data.present? %>
+                  <%= log.trigger_data["pattern_type"] || log.trigger_data["trigger_type"] || "Detected" %>
+                <% else %>
+                  —
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="text-slate-500 text-center py-4">No safety events recorded.</p>
+  <% end %>
+</div>
+
+<!-- Question flow (anonymized) -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+  <h2 class="text-lg font-semibold text-slate-900 mb-4">Question Flow</h2>
+  <p class="text-sm text-slate-500 mb-4">
+    Questions asked during the session. User responses are not displayed to protect privacy.
+  </p>
+
+  <% if @iterations.any? %>
+    <div class="space-y-4">
+      <% @iterations.each do |iteration| %>
+        <div class="border-l-2 border-violet-200 pl-4">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-violet-600">Step <%= iteration.iteration_number %></span>
+            <span class="text-xs text-slate-500">
+              Depth: <%= ((iteration.depth_score_at_end || 0) * 100).round %>%
+            </span>
+          </div>
+          <p class="text-slate-700 mt-1"><%= iteration.question_asked %></p>
+          <% if iteration.safety_intervention.present? %>
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 mt-2">
+              Intervention: <%= iteration.safety_intervention %>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-slate-500 text-center py-4">No iterations recorded.</p>
+  <% end %>
+</div>
+
+<div class="mt-6 p-4 bg-violet-50 border border-violet-200 rounded-lg text-sm text-violet-700">
+  <strong>Privacy Note:</strong> User identities and specific response content are not displayed.
+  This view shows only the session structure, safety events, and questions asked for oversight purposes.
+</div>

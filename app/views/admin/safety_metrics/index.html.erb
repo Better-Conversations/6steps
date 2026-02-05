@@ -1,0 +1,125 @@
+<% content_for :title, "Safety Metrics - Six Steps Admin" %>
+
+<div class="flex justify-between items-center mb-8">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900">Safety Metrics</h1>
+    <p class="text-slate-600">Aggregated safety and usage statistics</p>
+  </div>
+
+  <!-- Period selector -->
+  <div class="flex items-center space-x-2">
+    <span class="text-sm text-slate-500">Period:</span>
+    <div class="flex rounded-lg border border-slate-300 overflow-hidden">
+      <%= link_to "7 days", admin_safety_metrics_path(period: "7_days"), class: "px-3 py-1.5 text-sm #{@period == '7_days' ? 'bg-violet-600 text-white' : 'bg-white text-slate-700 hover:bg-slate-50'}" %>
+      <%= link_to "30 days", admin_safety_metrics_path(period: "30_days"), class: "px-3 py-1.5 text-sm #{@period == '30_days' ? 'bg-violet-600 text-white' : 'bg-white text-slate-700 hover:bg-slate-50'}" %>
+      <%= link_to "90 days", admin_safety_metrics_path(period: "90_days"), class: "px-3 py-1.5 text-sm #{@period == '90_days' ? 'bg-violet-600 text-white' : 'bg-white text-slate-700 hover:bg-slate-50'}" %>
+      <%= link_to "All time", admin_safety_metrics_path(period: "all_time"), class: "px-3 py-1.5 text-sm #{@period == 'all_time' ? 'bg-violet-600 text-white' : 'bg-white text-slate-700 hover:bg-slate-50'}" %>
+    </div>
+  </div>
+</div>
+
+<!-- Key metrics grid -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <p class="text-sm text-slate-500">Total Sessions</p>
+    <p class="text-3xl font-semibold text-slate-900"><%= @metrics[:total_sessions] %></p>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <p class="text-sm text-slate-500">Completion Rate</p>
+    <p class="text-3xl font-semibold text-emerald-600"><%= @completion_rate %>%</p>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <p class="text-sm text-slate-500">Avg. Depth Score</p>
+    <p class="text-3xl font-semibold text-slate-900"><%= (@metrics[:average_depth_score] * 100).round %>%</p>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <p class="text-sm text-slate-500">Avg. Iterations</p>
+    <p class="text-3xl font-semibold text-slate-900"><%= @metrics[:average_iterations] %></p>
+  </div>
+</div>
+
+<!-- Safety interventions -->
+<div class="grid lg:grid-cols-2 gap-6 mb-8">
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <h2 class="text-lg font-semibold text-slate-900 mb-4">Safety Interventions</h2>
+
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="w-3 h-3 rounded-full bg-purple-500 mr-3"></div>
+          <span class="text-slate-700">Crisis Activations</span>
+        </div>
+        <span class="text-lg font-semibold text-slate-900"><%= @metrics[:crisis_activations] %></span>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="w-3 h-3 rounded-full bg-violet-600 mr-3"></div>
+          <span class="text-slate-700">Grounding Insertions</span>
+        </div>
+        <span class="text-lg font-semibold text-slate-900"><%= @metrics[:grounding_insertions] %></span>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="w-3 h-3 rounded-full bg-amber-500 mr-3"></div>
+          <span class="text-slate-700">Pause Suggestions</span>
+        </div>
+        <span class="text-lg font-semibold text-slate-900"><%= @metrics[:pause_suggestions] %></span>
+      </div>
+    </div>
+
+    <% total_interventions = @metrics[:crisis_activations] + @metrics[:grounding_insertions] + @metrics[:pause_suggestions] %>
+    <% if @metrics[:total_sessions] > 0 %>
+      <div class="mt-6 pt-4 border-t border-slate-200">
+        <p class="text-sm text-slate-500">
+          Intervention rate: <strong><%= ((total_interventions.to_f / @metrics[:total_sessions]) * 100).round(1) %>%</strong> of sessions
+        </p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <h2 class="text-lg font-semibold text-slate-900 mb-4">Session Outcomes</h2>
+
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="w-3 h-3 rounded-full bg-emerald-500 mr-3"></div>
+          <span class="text-slate-700">Completed</span>
+        </div>
+        <span class="text-lg font-semibold text-slate-900"><%= @metrics[:completed_sessions] %></span>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="w-3 h-3 rounded-full bg-amber-500 mr-3"></div>
+          <span class="text-slate-700">Paused</span>
+        </div>
+        <span class="text-lg font-semibold text-slate-900"><%= @metrics[:paused_sessions] %></span>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="w-3 h-3 rounded-full bg-slate-400 mr-3"></div>
+          <span class="text-slate-700">Abandoned</span>
+        </div>
+        <span class="text-lg font-semibold text-slate-900"><%= @metrics[:abandoned_sessions] %></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notes -->
+<div class="bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm text-slate-600">
+  <p class="font-medium text-slate-700 mb-2">About these metrics</p>
+  <ul class="list-disc list-inside space-y-1">
+    <li>All data is aggregated and anonymized - no individual user information is shown</li>
+    <li>Depth scores are calculated using deterministic rule-based algorithms, not AI</li>
+    <li>Crisis activations indicate sessions where crisis patterns were detected</li>
+    <li>Completion rate = completed sessions / total sessions</li>
+  </ul>
+</div>

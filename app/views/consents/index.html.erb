@@ -1,0 +1,87 @@
+<% content_for :title, "Consent Management - Six Steps" %>
+
+<div class="max-w-2xl mx-auto">
+  <h1 class="text-2xl font-bold text-slate-900 mb-2">Consent Management</h1>
+  <p class="text-slate-600 mb-8">
+    To use Six Steps, we need your consent for processing certain types of data.
+    You can withdraw consent at any time.
+  </p>
+
+  <!-- Required consents for sessions -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+    <h2 class="text-lg font-semibold text-slate-900 mb-4">Required Consents</h2>
+    <p class="text-sm text-slate-600 mb-4">
+      These consents are required before you can start a reflection session.
+    </p>
+
+    <div class="space-y-4">
+      <% [:terms_of_service, :privacy_policy, :sensitive_data_processing, :session_reflections].each do |consent_type| %>
+        <% info = @consent_info[consent_type] %>
+        <% next unless info %>
+        <% active_consent = @consents[consent_type.to_s] %>
+
+        <div class="border border-slate-200 rounded-lg p-4 <%= active_consent ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50' %>">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center">
+                <h3 class="font-medium text-slate-900"><%= info[:title] %></h3>
+                <% if active_consent %>
+                  <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                    Consented
+                  </span>
+                <% end %>
+              </div>
+              <p class="text-sm text-slate-600 mt-1"><%= info[:description] %></p>
+              <% if active_consent %>
+                <p class="text-xs text-slate-500 mt-2">
+                  Given on <%= active_consent.given_at.strftime("%B %d, %Y at %H:%M") %>
+                  (Version <%= active_consent.version %>)
+                </p>
+              <% end %>
+            </div>
+            <div class="ml-4">
+              <% if active_consent %>
+                <%= button_to "Withdraw",
+                    withdraw_consents_path(consent_type: consent_type),
+                    method: :post,
+                    data: { turbo_confirm: "Are you sure you want to withdraw this consent? You won't be able to start new sessions until you consent again." },
+                    class: "text-sm text-purple-600 hover:text-purple-700 font-medium" %>
+              <% else %>
+                <%= button_to "I Consent",
+                    consents_path(consent_type: consent_type),
+                    method: :post,
+                    class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500" %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Status summary -->
+  <% if current_user.can_start_session? %>
+    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-6 text-center">
+      <svg class="mx-auto h-12 w-12 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3 class="mt-2 text-lg font-medium text-emerald-900">You're all set!</h3>
+      <p class="text-emerald-700 mt-1">You have provided all required consents.</p>
+      <div class="mt-4">
+        <%= link_to "Start a Session", new_journey_session_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
+      </div>
+    </div>
+  <% else %>
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
+      <svg class="mx-auto h-12 w-12 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <h3 class="mt-2 text-lg font-medium text-amber-900">Consent Required</h3>
+      <p class="text-amber-700 mt-1">Please provide all required consents above to start sessions.</p>
+    </div>
+  <% end %>
+
+  <div class="mt-6 text-center">
+    <%= link_to "Back to Dashboard", dashboard_path, class: "text-sm text-violet-600 hover:text-violet-700" %>
+  </div>
+</div>

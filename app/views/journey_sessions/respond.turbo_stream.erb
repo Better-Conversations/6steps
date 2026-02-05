@@ -1,0 +1,68 @@
+<% case @response %>
+<% when ConversationEngine::CrisisResponse %>
+  <%= turbo_stream.append "session-content" do %>
+    <%= render "crisis_modal" %>
+  <% end %>
+
+<% when ConversationEngine::GroundingResponse %>
+  <%= turbo_stream.update "conversation-frame" do %>
+    <%= render "grounding" %>
+    <%= render "conversation_content" %>
+  <% end %>
+
+<% when ConversationEngine::PauseResponse %>
+  <%= turbo_stream.update "session-content" do %>
+    <div class="bg-orange-50 border border-orange-200 rounded-xl p-6 mb-6">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <svg class="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div class="ml-4 flex-1">
+          <h3 class="text-lg font-medium text-orange-900">Would you like to take a break?</h3>
+          <p class="text-orange-700 mt-1">
+            You can pause here, view some resources, or continue when you're ready.
+          </p>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <%= button_to "Pause Session", pause_journey_session_path(@journey_session), method: :post, class: "inline-flex items-center px-4 py-2 border border-orange-300 rounded-lg text-sm font-medium text-orange-800 bg-orange-100 hover:bg-orange-200" %>
+            <%= link_to "Talk to Someone", crisis_resources_path, class: "inline-flex items-center px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50" %>
+            <%= link_to "Continue Gently", journey_session_path(@journey_session), class: "text-sm text-orange-600 hover:text-orange-700 underline ml-2" %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="conversation-frame">
+      <%= render "conversation_content" %>
+    </div>
+  <% end %>
+
+<% when ConversationEngine::IntegrationResponse %>
+  <% if @response.type == :completed %>
+    <%= turbo_stream.update "session-content" do %>
+      <%= render "completion" %>
+    <% end %>
+  <% else %>
+    <%= turbo_stream.update "session-content" do %>
+      <%= render "integration" %>
+    <% end %>
+  <% end %>
+
+<% else %>
+  <%= turbo_stream.update "conversation-frame" do %>
+    <%= render "conversation_content" %>
+  <% end %>
+  <%= turbo_stream.update "step-counter" do %>
+    Step <%= @journey_session.iteration_count %> of 6
+  <% end %>
+  <%= turbo_stream.update "progress-bar" do %>
+    <div class="flex items-center justify-between text-xs text-slate-500 mb-1">
+      <span>Progress</span>
+      <span><%= @journey_session.iteration_count %>/6 iterations</span>
+    </div>
+    <div class="w-full bg-slate-200 rounded-full h-2">
+      <div class="bg-violet-600 h-2 rounded-full transition-all duration-300"
+           style="width: <%= (@journey_session.iteration_count / 6.0 * 100).round %>%"></div>
+    </div>
+  <% end %>
+<% end %>

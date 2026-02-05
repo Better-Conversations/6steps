@@ -1,0 +1,58 @@
+<% content_for :title, "Session - Six Steps" %>
+
+<div class="max-w-3xl mx-auto" data-controller="session timer" data-timer-started-at-value="<%= @journey_session.started_at&.to_i %>">
+  <!-- Session header -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center">
+      <div class="<%= space_color_class(@journey_session.current_space) %> w-10 h-10 rounded-full flex items-center justify-center">
+        <%= space_icon(@journey_session.current_space) %>
+      </div>
+      <div class="ml-3">
+        <h1 class="text-lg font-semibold text-slate-900">
+          Exploring <%= @journey_session.current_space&.titleize %>
+        </h1>
+        <p class="text-sm text-slate-500">
+          <span data-timer-target="display"><%= format_elapsed_time(@elapsed_time) %></span>
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2">
+      <%= button_to "Pause", pause_journey_session_path(@journey_session), method: :post, class: "text-sm text-slate-600 hover:text-slate-800 px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50" %>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="mb-6" id="progress-bar">
+    <div class="flex items-center justify-between text-xs text-slate-500 mb-1">
+      <span>Exploring</span>
+    </div>
+    <div class="w-full bg-slate-200 rounded-full h-2">
+      <div class="bg-violet-600 h-2 rounded-full transition-all duration-300"
+           style="width: <%= (@journey_session.iteration_count / 6.0 * 100).round %>%"></div>
+    </div>
+  </div>
+
+  <!-- Session content area -->
+  <div id="session-content">
+    <% if @journey_session.completed? %>
+      <%= render "completion" %>
+    <% elsif @journey_session.integration? %>
+      <%= render "integration" %>
+    <% elsif @journey_session.paused? %>
+      <%= render "paused" %>
+    <% else %>
+      <%= render "conversation" %>
+    <% end %>
+  </div>
+
+  <!-- Footer reminder -->
+  <div class="mt-8 pt-6 border-t border-slate-200">
+    <div class="flex items-center justify-between text-sm text-slate-500">
+      <p>
+        <%= link_to "Support and resources", crisis_resources_path, class: "text-violet-600 hover:text-violet-700 underline" %> available if needed
+      </p>
+      <p>Session will auto-complete after 30 minutes</p>
+    </div>
+  </div>
+</div>

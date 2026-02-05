@@ -1,0 +1,162 @@
+<% content_for :title, "Account Settings - Six Steps" %>
+
+<div class="max-w-2xl mx-auto">
+  <h1 class="text-2xl font-bold text-slate-900 mb-8">Account Settings</h1>
+
+  <!-- Account Information -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-6">
+    <h2 class="text-lg font-semibold text-slate-900 mb-6">Account Information</h2>
+
+    <div class="grid sm:grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm font-medium text-slate-500 mb-1">Account Role</label>
+        <div class="flex items-center">
+          <% case resource.role %>
+          <% when "admin" %>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+              <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              Administrator
+            </span>
+          <% when "session_reviewer" %>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-violet-100 text-violet-800">
+              <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              Session Reviewer
+            </span>
+          <% else %>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-800">
+              <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              User
+            </span>
+          <% end %>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-500 mb-1">Member Since</label>
+        <p class="text-slate-900"><%= resource.created_at.strftime("%-d %B %Y") %></p>
+      </div>
+    </div>
+
+    <% if resource.role_admin? || resource.role_session_reviewer? %>
+      <div class="mt-4 pt-4 border-t border-slate-200">
+        <%= link_to admin_dashboard_path, class: "inline-flex items-center text-sm text-violet-600 hover:text-violet-700" do %>
+          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Go to Admin Dashboard
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Profile Settings -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-6">
+    <h2 class="text-lg font-semibold text-slate-900 mb-6">Profile Settings</h2>
+
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "space-y-6" }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <div>
+        <%= f.label :email, class: "block text-sm font-medium text-slate-700 mb-1" %>
+        <%= f.email_field :email,
+            autofocus: true,
+            autocomplete: "email",
+            class: "block w-full rounded-lg sm:text-sm" %>
+        <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+          <p class="mt-2 text-sm text-amber-600">
+            Currently waiting confirmation for: <%= resource.unconfirmed_email %>
+          </p>
+        <% end %>
+      </div>
+
+      <div>
+        <%= f.label :region, "Your region", class: "block text-sm font-medium text-slate-700 mb-1" %>
+        <p class="text-xs text-slate-500 mb-2">Used to show relevant support resources.</p>
+        <%= f.select :region,
+            options_for_select([
+              ["United Kingdom", "uk"],
+              ["United States", "us"],
+              ["European Union", "eu"],
+              ["Australia", "au"],
+              ["Other", "other"]
+            ], resource.region),
+            {},
+            class: "block w-full rounded-lg sm:text-sm" %>
+      </div>
+
+      <hr class="border-slate-200">
+
+      <h3 class="text-md font-medium text-slate-900">Change Password</h3>
+      <p class="text-sm text-slate-500 mb-4">Leave blank if you don't want to change it.</p>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :password, "New password", class: "block text-sm font-medium text-slate-700 mb-1" %>
+          <%= f.password_field :password,
+              autocomplete: "new-password",
+              class: "block w-full rounded-lg sm:text-sm" %>
+          <% if @minimum_password_length %>
+            <p class="text-xs text-slate-500 mt-1"><%= @minimum_password_length %> characters minimum</p>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.label :password_confirmation, "Confirm password", class: "block text-sm font-medium text-slate-700 mb-1" %>
+          <%= f.password_field :password_confirmation,
+              autocomplete: "new-password",
+              class: "block w-full rounded-lg sm:text-sm" %>
+        </div>
+      </div>
+
+      <hr class="border-slate-200">
+
+      <div>
+        <%= f.label :current_password, class: "block text-sm font-medium text-slate-700 mb-1" %>
+        <p class="text-xs text-slate-500 mb-2">We need your current password to confirm changes.</p>
+        <%= f.password_field :current_password,
+            autocomplete: "current-password",
+            class: "block w-full rounded-lg sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= f.submit "Update settings",
+            class: "inline-flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- GDPR Data Export -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-6">
+    <h2 class="text-lg font-semibold text-slate-900 mb-2">Export Your Data</h2>
+    <p class="text-sm text-slate-600 mb-4">
+      Download a copy of all your personal data in JSON format (GDPR Article 20).
+    </p>
+    <%= link_to "Download my data",
+        export_user_data_path(format: :json),
+        class: "inline-flex items-center px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500" %>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="bg-white rounded-xl shadow-sm border border-purple-200 p-8">
+    <h2 class="text-lg font-semibold text-purple-700 mb-2">Delete Account</h2>
+    <p class="text-sm text-slate-600 mb-4">
+      Permanently delete your account and all associated data. This action cannot be undone.
+    </p>
+    <%= button_to "Delete my account",
+        registration_path(resource_name),
+        method: :delete,
+        data: { turbo_confirm: "Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently deleted." },
+        class: "inline-flex items-center px-4 py-2 border border-rose-300 rounded-lg text-sm font-medium text-rose-700 bg-white hover:bg-rose-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+  </div>
+
+  <div class="mt-6 text-center">
+    <%= link_to "Back to Dashboard", dashboard_path, class: "text-sm text-violet-600 hover:text-violet-700" %>
+  </div>
+</div>

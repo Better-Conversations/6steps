@@ -1,0 +1,155 @@
+<% content_for :title, "Admin Dashboard - Six Steps" %>
+
+<div class="mb-8">
+  <h1 class="text-2xl font-bold text-slate-900">Admin Dashboard</h1>
+  <p class="text-slate-600">Overview of session activity and safety metrics</p>
+</div>
+
+<!-- Key metrics -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <div class="flex items-center">
+      <div class="flex-shrink-0 bg-violet-100 rounded-full p-3">
+        <svg class="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </div>
+      <div class="ml-4">
+        <p class="text-sm text-slate-500">Total Sessions</p>
+        <p class="text-2xl font-semibold text-slate-900"><%= @total_sessions %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <div class="flex items-center">
+      <div class="flex-shrink-0 bg-emerald-100 rounded-full p-3">
+        <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <div class="ml-4">
+        <p class="text-sm text-slate-500">Completed</p>
+        <p class="text-2xl font-semibold text-slate-900"><%= @completed_sessions %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <div class="flex items-center">
+      <div class="flex-shrink-0 bg-purple-100 rounded-full p-3">
+        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <div class="ml-4">
+        <p class="text-sm text-slate-500">Crisis Activations</p>
+        <p class="text-2xl font-semibold text-slate-900"><%= @crisis_activations %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <div class="flex items-center">
+      <div class="flex-shrink-0 bg-violet-100 rounded-full p-3">
+        <svg class="w-6 h-6 text-violet-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </div>
+      <div class="ml-4">
+        <p class="text-sm text-slate-500">Grounding Insertions</p>
+        <p class="text-2xl font-semibold text-slate-900"><%= @grounding_insertions %></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-6">
+  <!-- Depth distribution -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <h2 class="text-lg font-semibold text-slate-900 mb-4">Depth Score Distribution</h2>
+
+    <div class="space-y-3">
+      <div class="flex items-center">
+        <span class="w-3 h-3 rounded-full bg-emerald-500 mr-2"></span>
+        <span class="w-20 text-sm text-slate-600">Green</span>
+        <div class="flex-1 h-4 bg-slate-200 rounded-full overflow-hidden">
+          <div class="h-full bg-emerald-500" style="width: <%= @depth_distribution[:green] > 0 ? ([@depth_distribution[:green].to_f / @total_sessions * 100, 100].min) : 0 %>%"></div>
+        </div>
+        <span class="w-12 text-right text-sm text-slate-600"><%= @depth_distribution[:green] %></span>
+      </div>
+      <div class="flex items-center">
+        <span class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></span>
+        <span class="w-20 text-sm text-slate-600">Amber</span>
+        <div class="flex-1 h-4 bg-slate-200 rounded-full overflow-hidden">
+          <div class="h-full bg-yellow-500" style="width: <%= @depth_distribution[:amber] > 0 ? ([@depth_distribution[:amber].to_f / @total_sessions * 100, 100].min) : 0 %>%"></div>
+        </div>
+        <span class="w-12 text-right text-sm text-slate-600"><%= @depth_distribution[:amber] %></span>
+      </div>
+      <div class="flex items-center">
+        <span class="w-3 h-3 rounded-full bg-orange-400 mr-2"></span>
+        <span class="w-20 text-sm text-slate-600">Amber-Red</span>
+        <div class="flex-1 h-4 bg-slate-200 rounded-full overflow-hidden">
+          <div class="h-full bg-orange-400" style="width: <%= @depth_distribution[:amber_red] > 0 ? ([@depth_distribution[:amber_red].to_f / @total_sessions * 100, 100].min) : 0 %>%"></div>
+        </div>
+        <span class="w-12 text-right text-sm text-slate-600"><%= @depth_distribution[:amber_red] %></span>
+      </div>
+      <div class="flex items-center">
+        <span class="w-3 h-3 rounded-full bg-red-600 mr-2"></span>
+        <span class="w-20 text-sm text-slate-600">Red</span>
+        <div class="flex-1 h-4 bg-slate-200 rounded-full overflow-hidden">
+          <div class="h-full bg-red-600" style="width: <%= @depth_distribution[:red] > 0 ? ([@depth_distribution[:red].to_f / @total_sessions * 100, 100].min) : 0 %>%"></div>
+        </div>
+        <span class="w-12 text-right text-sm text-slate-600"><%= @depth_distribution[:red] %></span>
+      </div>
+      <div class="flex items-center">
+        <span class="w-3 h-3 rounded-full bg-red-800 mr-2"></span>
+        <span class="w-20 text-sm text-slate-600">Deep Red</span>
+        <div class="flex-1 h-4 bg-slate-200 rounded-full overflow-hidden">
+          <div class="h-full bg-red-800" style="width: <%= @depth_distribution[:deep_red] > 0 ? ([@depth_distribution[:deep_red].to_f / @total_sessions * 100, 100].min) : 0 %>%"></div>
+        </div>
+        <span class="w-12 text-right text-sm text-slate-600"><%= @depth_distribution[:deep_red] %></span>
+      </div>
+    </div>
+
+    <p class="mt-4 text-xs text-slate-500">
+      Distribution based on maximum depth score reached during sessions.
+    </p>
+  </div>
+
+  <!-- Recent flagged sessions -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-semibold text-slate-900">Recent Flagged Sessions</h2>
+      <%= link_to "View All", admin_session_reviews_path, class: "text-sm text-violet-600 hover:text-violet-700" %>
+    </div>
+
+    <% if @recent_flagged_sessions.any? %>
+      <div class="space-y-3">
+        <% @recent_flagged_sessions.each do |session| %>
+          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+            <div>
+              <p class="text-sm font-medium text-slate-900">
+                Session #<%= session.id %>
+              </p>
+              <p class="text-xs text-slate-500">
+                <%= session.created_at.strftime("%b %d, %Y %H:%M") %>
+                &bull; Depth: <%= (session.current_depth_score * 100).round %>%
+              </p>
+            </div>
+            <%= link_to "Review", admin_session_review_path(session), class: "text-sm text-violet-600 hover:text-violet-700" %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-slate-500 text-center py-8">No flagged sessions yet.</p>
+    <% end %>
+  </div>
+</div>
+
+<div class="mt-6 text-sm text-slate-500">
+  <p>
+    <strong>Note:</strong> All session data is anonymized. User identities and specific content are not visible.
+    Only safety patterns and metadata are available for review.
+  </p>
+</div>

@@ -1,0 +1,256 @@
+<% content_for :title, "The Approach - Six Steps" %>
+
+<div class="max-w-3xl mx-auto">
+  <h1 class="text-3xl font-bold text-slate-900 mb-4">The Approach</h1>
+  <p class="text-lg text-slate-600 mb-8">Understanding how Six Spaces works and why the questions feel different.</p>
+
+  <div class="space-y-8">
+    <!-- Introduction -->
+    <div class="bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-100 rounded-2xl p-8">
+      <h2 class="text-xl font-semibold text-slate-900 mb-4">Stepping into Quiet Spaces</h2>
+      <p class="text-slate-700 mb-4">
+        Six Spaces offers six quiet places to step into - six perspectives from which to explore
+        your experience: <strong>Here, There, Before, After, Inside,</strong> and <strong>Outside</strong>.
+      </p>
+      <p class="text-slate-700 mb-4">
+        Each session, you choose one space to step into. A series of gentle questions helps you
+        discover what's there - at your own pace, in your own way.
+      </p>
+      <p class="text-slate-700">
+        Unlike advice-giving or problem-solving, this approach trusts that <em>you</em> already have
+        the insights you need. The questions simply help them surface.
+      </p>
+    </div>
+
+    <!-- The Six Spaces -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+      <h2 class="text-xl font-semibold text-slate-900 mb-6">The Six Spaces</h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        <% QuestionGenerator::SPACE_DESCRIPTIONS.each do |space_key, space_info| %>
+          <div class="flex items-start p-4 rounded-lg bg-slate-50">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center <%= space_color_class(space_key) %>">
+              <%= space_icon(space_key) %>
+            </div>
+            <div class="ml-4">
+              <h3 class="font-medium text-slate-900"><%= space_info[:name] %></h3>
+              <p class="text-sm text-slate-600"><%= space_info[:description] %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Origins -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+      <h2 class="text-xl font-semibold text-slate-900 mb-4">Origins</h2>
+      <p class="text-slate-600 mb-4">
+        This approach is inspired by the work of <strong>David Grove</strong> (1950-2008), a New Zealand
+        psychologist with European and Māori ancestry. Grove completed a BSc at the University
+        of Canterbury, followed by postgraduate studies in Business Administration at Otago University
+        and a degree in Counselling Psychology at the State University of Minnesota.
+      </p>
+      <p class="text-slate-600 mb-4">
+        While working with people experiencing distress during the 1980s, Grove discovered that they would often
+        speak in metaphor to describe their experience. He found that the most effective way of helping
+        them was to honour their metaphors by asking open questions that reflected their exact words.
+        Over years of practice, he identified questions that would least influence the person, giving
+        this process the name <strong>"Clean Language"</strong>.
+      </p>
+      <p class="text-slate-600 mb-4">
+        Grove later developed these linguistic techniques into spatial methods, culminating in
+        <strong>"Emergent Knowledge"</strong> - based on the science of emergence (how complex patterns
+        arise from simple rules, like ant colonies or internet search algorithms). The approach uses
+        iterative questions - asked approximately six times - to help previously obscured knowledge
+        emerge naturally.
+      </p>
+      <p class="text-slate-600">
+        Six Spaces adapts these Emergent Knowledge principles for self-guided reflection, with safety
+        boundaries that make it suitable for unsupervised use.
+      </p>
+    </div>
+
+    <!-- Key Principles -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+      <h2 class="text-xl font-semibold text-slate-900 mb-4">Key Principles</h2>
+
+      <div class="space-y-6">
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center mr-4">
+            <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-medium text-slate-900 mb-1">Your Words, Reflected</h3>
+            <p class="text-slate-600">
+              The questions use your exact words. If you mention "uncertainty," the next question
+              might be "And when uncertainty, what do you notice?" or "And uncertainty is like what?"
+              This honours your language rather than interpreting or translating it.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center mr-4">
+            <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-medium text-slate-900 mb-1">Minimal Assumptions</h3>
+            <p class="text-slate-600">
+              "Clean" questions avoid leading you toward any particular answer. They don't assume
+              what you should feel or what you need. The exploration is entirely yours.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center mr-4">
+            <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-medium text-slate-900 mb-1">Bounded and Safe</h3>
+            <p class="text-slate-600">
+              Unlike open-ended exploration, Six Spaces has clear boundaries: one space per session,
+              30 minutes maximum. This containment makes the process manageable and prevents
+              going too deep without support.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center mr-4">
+            <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-medium text-slate-900 mb-1">No Right or Wrong</h3>
+            <p class="text-slate-600">
+              There are no correct answers. Whatever comes to mind is valid. Sometimes the most
+              useful responses are the ones that surprise you.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Why It Feels Strange -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+      <h2 class="text-xl font-semibold text-slate-900 mb-4">Why the Questions Feel Strange</h2>
+      <p class="text-slate-600 mb-4">
+        You might notice the questions are phrased unusually. Phrases like "And when..." or
+        "And is there anything else about..." might feel awkward. This is deliberate.
+      </p>
+      <p class="text-slate-600 mb-4">
+        The questions follow patterns from Emergent Knowledge techniques: they begin with "And"
+        to create a gentler, less invasive feel. They're delivered in a rhythm that allows space
+        for your intuition to respond, rather than your conscious mind rushing to answer.
+      </p>
+      <p class="text-slate-600 mb-4">
+        You'll notice the questions deepen as you go - from noticing ("what do you notice?"),
+        to exploring metaphor ("is like what?"), to extracting knowledge ("what does it know?"),
+        and finally to integration ("what do you know now?"). This iterative pattern helps
+        knowledge emerge that may have been obscured.
+      </p>
+      <p class="text-slate-600">
+        If it feels strange, that's okay. Many people find that after a session or two, the
+        strangeness becomes helpful - it signals a different kind of exploration is happening.
+      </p>
+    </div>
+
+    <!-- What This Is Not -->
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-8">
+      <h2 class="text-xl font-semibold text-amber-900 mb-4">What This Is Not</h2>
+      <div class="space-y-3 text-amber-800">
+        <p>
+          <strong>Not professional support:</strong> This is self-reflection, not coaching, counselling,
+          or therapy. It doesn't replace professional support.
+        </p>
+        <p>
+          <strong>Not advice:</strong> The questions don't tell you what to think or do. Any insights
+          come from you.
+        </p>
+        <p>
+          <strong>Not analysis:</strong> We don't interpret your responses or tell you what they mean.
+        </p>
+        <p>
+          <strong>Not AI:</strong> The question patterns are deterministic, not generated by artificial
+          intelligence. Your data is not used for training.
+        </p>
+      </div>
+    </div>
+
+    <!-- Getting the Most from It -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+      <h2 class="text-xl font-semibold text-slate-900 mb-4">Getting the Most from It</h2>
+      <ul class="space-y-3 text-slate-600">
+        <li class="flex items-start">
+          <span class="text-violet-500 mr-2">&bull;</span>
+          <span><strong>Take your time.</strong> There's no rush. Let your responses emerge naturally.</span>
+        </li>
+        <li class="flex items-start">
+          <span class="text-violet-500 mr-2">&bull;</span>
+          <span><strong>Trust what comes.</strong> Even if a response seems odd, go with it.</span>
+        </li>
+        <li class="flex items-start">
+          <span class="text-violet-500 mr-2">&bull;</span>
+          <span><strong>Use your own words.</strong> Plain language works best. No need to be eloquent.</span>
+        </li>
+        <li class="flex items-start">
+          <span class="text-violet-500 mr-2">&bull;</span>
+          <span><strong>Pause if needed.</strong> You can always pause a session and return later.</span>
+        </li>
+        <li class="flex items-start">
+          <span class="text-violet-500 mr-2">&bull;</span>
+          <span><strong>Notice what emerges.</strong> The final question asks what you know now - this is often where insight crystallises.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Further Reading -->
+    <div class="bg-slate-50 rounded-xl p-8">
+      <h2 class="text-xl font-semibold text-slate-900 mb-4">Learn More</h2>
+      <p class="text-slate-600 mb-4">
+        If you're interested in the underlying techniques, here are some resources:
+      </p>
+      <ul class="space-y-2 text-slate-600">
+        <li>
+          <a href="https://en.wikipedia.org/wiki/Clean_language" target="_blank" rel="noopener noreferrer" class="text-violet-600 hover:text-violet-800 underline">
+            Clean Language (Wikipedia)
+          </a>
+        </li>
+        <li>
+          <a href="https://www.cleanlanguage.co.uk" target="_blank" rel="noopener noreferrer" class="text-violet-600 hover:text-violet-800 underline">
+            Clean Language Resources
+          </a>
+        </li>
+        <li>
+          <a href="https://www.cleancoaching.com" target="_blank" rel="noopener noreferrer" class="text-violet-600 hover:text-violet-800 underline">
+            Clean Coaching Centre
+          </a>
+        </li>
+      </ul>
+      <p class="text-slate-600 mt-4 mb-2">
+        <strong>Books:</strong>
+      </p>
+      <ul class="space-y-1 text-slate-600">
+        <li>"Clean Coaching: The Insider Guide to Making Change Happen" by Angela Dunbar</li>
+        <li>"Metaphors in Mind" by Penny Tompkins and James Lawley</li>
+        <li>"The Life and Work of David Grove" by Carol Wilson</li>
+      </ul>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="text-center py-8">
+      <% if user_signed_in? %>
+        <%= link_to "Start a Reflection", new_journey_session_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500" %>
+      <% else %>
+        <%= link_to "Learn More About Six Steps", about_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500" %>
+      <% end %>
+    </div>
+  </div>
+</div>

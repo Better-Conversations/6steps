@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/forms";
+
+/*
+ * Safelist depth score colours for admin dashboard.
+ * Tailwind v4 uses @source to force class generation from a file.
+ * See: https://tailwindcss.com/docs/detecting-classes-in-source-files
+ */
+@source "./safelist.txt";

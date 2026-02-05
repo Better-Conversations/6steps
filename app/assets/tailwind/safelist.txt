@@ -1,0 +1,5 @@
+bg-emerald-500
+bg-yellow-500
+bg-orange-400
+bg-red-600
+bg-red-800

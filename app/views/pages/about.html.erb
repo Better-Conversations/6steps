@@ -1,0 +1,95 @@
+<% content_for :title, "About Six Steps" %>
+
+<div class="max-w-3xl mx-auto">
+  <h1 class="text-3xl font-bold text-slate-900 mb-8">About Six Steps</h1>
+
+  <div class="space-y-8">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+      <h2 class="text-xl font-semibold text-slate-900 mb-4">What is Six Steps?</h2>
+      <p class="text-slate-600 mb-4">
+        Six Steps offers quiet spaces to step into for self-reflection.
+        It provides a structured, safe environment to explore your experience through gentle questions that honour your own words and perspectives.
+      </p>
+      <p class="text-slate-600">
+        The approach uses Six Spaces, inspired by Emergent Knowledge techniques developed by David Grove. By stepping into one quiet space
+        per session with a 30-minute limit, the process remains manageable and contained.
+      </p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+      <h2 class="text-xl font-semibold text-slate-900 mb-4">The Six Spaces</h2>
+      <p class="text-slate-600 mb-6">
+        Each session begins by choosing a quiet space to step into - a perspective from which to explore your experience:
+      </p>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        <% QuestionGenerator::SPACE_DESCRIPTIONS.each do |space_key, space_info| %>
+          <div class="flex items-start p-4 rounded-lg bg-slate-50">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center <%= space_color_class(space_key) %>">
+              <%= space_icon(space_key) %>
+            </div>
+            <div class="ml-4">
+              <h3 class="font-medium text-slate-900"><%= space_info[:name] %></h3>
+              <p class="text-sm text-slate-600"><%= space_info[:description] %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+      <h2 class="text-xl font-semibold text-slate-900 mb-4">How Sessions Work</h2>
+      <ol class="list-decimal list-inside text-slate-600 space-y-3">
+        <li>You choose a quiet space to step into</li>
+        <li>You receive a gentle question related to that space</li>
+        <li>You respond in your own words</li>
+        <li>The next question reflects your words back to you</li>
+        <li>This continues through a series of deepening questions</li>
+        <li>The session ends with "And what do you know now that you didn't know before?"</li>
+      </ol>
+      <p class="text-slate-600 mt-4">
+        Sessions are limited to 30 minutes. You can pause at any time and return later.
+      </p>
+      <p class="text-slate-600 mt-4">
+        <%= link_to "Learn more about the approach", approach_path, class: "text-violet-600 hover:text-violet-700 underline" %>
+      </p>
+    </div>
+
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-8">
+      <h2 class="text-xl font-semibold text-amber-900 mb-4">Important Information</h2>
+      <p class="text-amber-800 mb-4">
+        Six Steps is a tool for structured self-reflection. It is not intended as a substitute for
+        professional coaching, counselling, or therapy.
+      </p>
+      <p class="text-amber-800 mb-4">
+        If you're looking for additional support, please reach out to:
+      </p>
+      <ul class="list-disc list-inside text-amber-800 space-y-1">
+        <li>A professional coach, counsellor, or therapist</li>
+        <li>A trusted friend or family member</li>
+        <li>A support helpline in your region</li>
+      </ul>
+      <% if user_signed_in? %>
+        <p class="text-amber-800 mt-4">
+          <%= link_to "View support and resources", crisis_resources_path, class: "underline font-medium hover:text-amber-900" %>
+        </p>
+      <% end %>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+      <h2 class="text-xl font-semibold text-slate-900 mb-4">Your Privacy</h2>
+      <p class="text-slate-600 mb-4">
+        Your reflections are private and encrypted. We follow strict data protection standards:
+      </p>
+      <ul class="list-disc list-inside text-slate-600 space-y-2">
+        <li>All personal content is encrypted at rest</li>
+        <li>Reflection content is automatically deleted after 30 days</li>
+        <li>You can export or delete your data at any time</li>
+        <li>We never share your personal information</li>
+      </ul>
+      <p class="text-slate-600 mt-4">
+        Read our full <%= link_to "Privacy Policy", privacy_path, class: "text-violet-600 hover:text-violet-700 underline" %>.
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,46 @@
+<div class="bg-violet-50 border border-violet-200 rounded-xl p-6 mb-6" data-controller="grounding">
+  <div class="flex items-start">
+    <div class="flex-shrink-0">
+      <svg class="h-8 w-8 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+      </svg>
+    </div>
+    <div class="ml-4 flex-1">
+      <h3 class="text-lg font-medium text-violet-900 mb-2">Let's pause for a moment</h3>
+      <p class="text-violet-800 mb-4">
+        Before we continue, let's take a gentle breath together.
+      </p>
+
+      <div class="bg-white rounded-lg p-6 text-center">
+        <div class="mb-4">
+          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-violet-100 text-violet-700"
+               data-grounding-target="circle">
+            <span class="text-lg font-medium" data-grounding-target="text">Ready</span>
+          </div>
+        </div>
+
+        <p class="text-slate-600 mb-4" data-grounding-target="instruction">
+          Click the button below to begin a brief breathing exercise.
+        </p>
+
+        <button type="button"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-violet-700 hover:bg-violet-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-600"
+                data-action="click->grounding#start"
+                data-grounding-target="startButton">
+          Begin Breathing Exercise
+        </button>
+
+        <button type="button"
+                class="hidden inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-violet-700 hover:bg-violet-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-600"
+                data-action="click->grounding#continue"
+                data-grounding-target="continueButton">
+          Continue with Session
+        </button>
+      </div>
+
+      <p class="text-sm text-violet-700 mt-4">
+        You can also <%= link_to "view support and resources", crisis_resources_path, class: "underline font-medium hover:text-violet-800" %> at any time.
+      </p>
+    </div>
+  </div>
+</div>

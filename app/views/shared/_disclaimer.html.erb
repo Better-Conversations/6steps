@@ -1,0 +1,6 @@
+<p class="text-sm text-slate-500 text-center">
+  Six Steps is a tool for structured self-reflection. It is not intended as a substitute for professional support.
+  <% if user_signed_in? %>
+    You can access further <%= link_to "support and resources", crisis_resources_path, class: "text-slate-600 underline hover:text-slate-700" %> here if you need them.
+  <% end %>
+</p>

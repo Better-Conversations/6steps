@@ -1,0 +1,2 @@
+web: bundle exec bin/rails server
+css: bundle exec bin/rails tailwindcss:watch

@@ -1,0 +1,181 @@
+<% content_for :title, "Invite Details - Six Steps" %>
+
+<div class="mb-8">
+  <%= link_to admin_invites_path, class: "inline-flex items-center text-sm text-slate-600 hover:text-slate-900" do %>
+    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+    Back to Invites
+  <% end %>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 max-w-2xl">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">Invite Details</h1>
+    <div class="flex items-center gap-2">
+      <% if @invite.multi_use? %>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+          General Link
+        </span>
+      <% end %>
+      <% case @invite.status %>
+      <% when :valid %>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800">
+          Valid
+        </span>
+      <% when :active %>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800">
+          Active
+        </span>
+      <% when :used %>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+          Used
+        </span>
+      <% when :exhausted %>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800">
+          Limit Reached
+        </span>
+      <% when :expired %>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-800">
+          Expired
+        </span>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <!-- Invite URL (only show if valid) -->
+    <% if @invite.valid_for_use? %>
+      <div class="bg-violet-50 border border-violet-200 rounded-lg p-4">
+        <label class="block text-sm font-medium text-violet-900 mb-2">Invite Link</label>
+        <div class="flex items-center">
+          <input type="text"
+                 value="<%= @invite.invite_url %>"
+                 readonly
+                 class="flex-1 text-sm font-mono bg-white border border-violet-300 rounded-lg px-3 py-2 text-slate-700"
+                 id="invite-url">
+          <button onclick="navigator.clipboard.writeText(document.getElementById('invite-url').value); this.textContent = 'Copied!';"
+                  class="ml-3 px-4 py-2 text-sm font-medium text-violet-700 bg-violet-100 hover:bg-violet-200 rounded-lg">
+            Copy
+          </button>
+        </div>
+        <p class="text-xs text-violet-700 mt-2">
+          Share this link with the person you want to invite. It will expire on <%= @invite.expires_at.strftime("%B %d, %Y at %H:%M") %>.
+        </p>
+      </div>
+    <% end %>
+
+    <div class="grid grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm font-medium text-slate-500 mb-1">Token</label>
+        <code class="text-sm font-mono text-slate-900"><%= @invite.token %></code>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-500 mb-1">Type</label>
+        <p class="text-slate-900"><%= @invite.multi_use? ? "General Link (multi-use)" : "Single-use" %></p>
+      </div>
+
+      <% unless @invite.multi_use? %>
+        <div>
+          <label class="block text-sm font-medium text-slate-500 mb-1">Email Restriction</label>
+          <p class="text-slate-900"><%= @invite.email.presence || "None (any email can use this invite)" %></p>
+        </div>
+      <% end %>
+
+      <% if @invite.multi_use? %>
+        <div>
+          <label class="block text-sm font-medium text-slate-500 mb-1">Usage</label>
+          <p class="text-slate-900">
+            <%= @invite.use_count %> registrations
+            <% if @invite.max_uses %>
+              <span class="text-slate-500">/ <%= @invite.max_uses %> max</span>
+            <% else %>
+              <span class="text-slate-500">(unlimited)</span>
+            <% end %>
+          </p>
+        </div>
+      <% end %>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-500 mb-1">Created By</label>
+        <p class="text-slate-900"><%= @invite.created_by&.email || "System" %></p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-500 mb-1">Created At</label>
+        <p class="text-slate-900"><%= @invite.created_at.strftime("%B %d, %Y at %H:%M") %></p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-500 mb-1">Expires At</label>
+        <p class="text-slate-900"><%= @invite.expires_at.strftime("%B %d, %Y at %H:%M") %></p>
+      </div>
+
+      <% if @invite.time_remaining %>
+        <div>
+          <label class="block text-sm font-medium text-slate-500 mb-1">Time Remaining</label>
+          <p class="text-slate-900"><%= distance_of_time_in_words(@invite.time_remaining) %></p>
+        </div>
+      <% end %>
+    </div>
+
+    <% if @invite.notes.present? %>
+      <div>
+        <label class="block text-sm font-medium text-slate-500 mb-1">Notes</label>
+        <p class="text-slate-900"><%= @invite.notes %></p>
+      </div>
+    <% end %>
+
+    <% if @invite.used? %>
+      <div class="border-t border-slate-200 pt-6">
+        <h2 class="text-lg font-semibold text-slate-900 mb-4">Usage Information</h2>
+        <% if @invite.multi_use? %>
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-slate-500 mb-1">Total Registrations</label>
+              <p class="text-slate-900"><%= @invite.use_count %></p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-500 mb-1">First Used</label>
+              <p class="text-slate-900"><%= @invite.used_at&.strftime("%B %d, %Y at %H:%M") %></p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-500 mb-1">First User</label>
+              <p class="text-slate-900"><%= @invite.used_by&.email %></p>
+            </div>
+            <% if @invite.max_uses %>
+              <div>
+                <label class="block text-sm font-medium text-slate-500 mb-1">Remaining Uses</label>
+                <p class="text-slate-900"><%= @invite.remaining_uses %></p>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-slate-500 mb-1">Used By</label>
+              <p class="text-slate-900"><%= @invite.used_by&.email %></p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-500 mb-1">Used At</label>
+              <p class="text-slate-900"><%= @invite.used_at&.strftime("%B %d, %Y at %H:%M") %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @invite.valid_for_use? %>
+      <div class="border-t border-slate-200 pt-6">
+        <%= button_to "Revoke Invite", revoke_admin_invite_path(@invite),
+            method: :post,
+            class: "inline-flex items-center px-4 py-2 border border-rose-300 text-sm font-medium rounded-lg text-rose-700 bg-rose-50 hover:bg-rose-100",
+            data: { turbo_confirm: "Are you sure you want to revoke this invite? This cannot be undone." } %>
+        <p class="text-xs text-slate-500 mt-2">
+          Revoking an invite will prevent it from being used to register.
+        </p>
+      </div>
+    <% end %>
+  </div>
+</div>

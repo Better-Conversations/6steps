@@ -1,0 +1,91 @@
+<% content_for :title, "Sign up - Six Steps" %>
+
+<div class="max-w-md mx-auto">
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+    <h1 class="text-2xl font-bold text-slate-900 mb-2 text-center">Create your account</h1>
+    <p class="text-slate-600 text-center mb-6">Begin your reflection journey</p>
+
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-6" }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <%# Pass the invite token through to the create action %>
+      <%= hidden_field_tag :invite_token, params[:invite] %>
+
+      <% if @invite&.email_restricted? %>
+        <%# Email is pre-filled and locked for email-restricted invites %>
+        <div>
+          <%= f.label :email, class: "block text-sm font-medium text-slate-700 mb-1" %>
+          <%= f.email_field :email,
+              value: @invite.email,
+              readonly: true,
+              class: "block w-full rounded-lg bg-slate-100 text-slate-600 sm:text-sm" %>
+          <p class="text-xs text-slate-500 mt-1">This invite is restricted to this email address.</p>
+        </div>
+      <% else %>
+        <div>
+          <%= f.label :email, class: "block text-sm font-medium text-slate-700 mb-1" %>
+          <%= f.email_field :email,
+              autofocus: true,
+              autocomplete: "email",
+              placeholder: "you@example.com",
+              class: "block w-full rounded-lg sm:text-sm" %>
+        </div>
+      <% end %>
+
+      <div>
+        <%= f.label :region, "Your region", class: "block text-sm font-medium text-slate-700 mb-1" %>
+        <p class="text-xs text-slate-500 mb-2">We use this to show relevant support resources if needed.</p>
+        <%= f.select :region,
+            options_for_select([
+              ["United Kingdom", "uk"],
+              ["United States", "us"],
+              ["European Union", "eu"],
+              ["Australia", "au"],
+              ["Other", "other"]
+            ], resource.region || "uk"),
+            {},
+            class: "block w-full rounded-lg sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= f.label :password, class: "block text-sm font-medium text-slate-700 mb-1" %>
+        <% if @minimum_password_length %>
+          <p class="text-xs text-slate-500 mb-2">Minimum <%= @minimum_password_length %> characters</p>
+        <% end %>
+        <%= f.password_field :password,
+            autocomplete: "new-password",
+            class: "block w-full rounded-lg sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= f.label :password_confirmation, "Confirm password", class: "block text-sm font-medium text-slate-700 mb-1" %>
+        <%= f.password_field :password_confirmation,
+            autocomplete: "new-password",
+            class: "block w-full rounded-lg sm:text-sm" %>
+      </div>
+
+      <div class="bg-slate-50 rounded-lg p-4 text-sm text-slate-600">
+        <p class="mb-2">By signing up, you acknowledge that:</p>
+        <ul class="list-disc list-inside space-y-1 text-xs">
+          <li>This is a tool for structured self-reflection, not a substitute for professional support</li>
+          <li>You agree to our <%= link_to "Terms of Service", terms_path, class: "text-violet-600 hover:text-violet-700 underline" %></li>
+          <li>You have read our <%= link_to "Privacy Policy", privacy_path, class: "text-violet-600 hover:text-violet-700 underline" %></li>
+        </ul>
+      </div>
+
+      <div>
+        <%= f.submit "Create account",
+            class: "w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 cursor-pointer" %>
+      </div>
+    <% end %>
+
+    <div class="mt-6 text-center text-sm text-slate-600">
+      Already have an account?
+      <%= link_to "Sign in", new_user_session_path, class: "text-violet-600 hover:text-violet-700 font-medium" %>
+    </div>
+  </div>
+
+  <div class="mt-6">
+    <%= render "shared/disclaimer" %>
+  </div>
+</div>

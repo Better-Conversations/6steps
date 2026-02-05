@@ -1,0 +1,138 @@
+<% content_for :title, "Start a Session - Six Steps" %>
+
+<div class="max-w-4xl mx-auto" data-controller="space-selection">
+  <% if @first_time %>
+    <!-- First-time user onboarding -->
+    <div class="bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-100 rounded-2xl p-8 mb-8">
+      <h2 class="text-xl font-semibold text-slate-900 mb-4">Welcome to Your First Reflection</h2>
+
+      <div class="space-y-4 text-slate-700">
+        <p>
+          This experience might feel a little different from what you're used to. That's intentional.
+        </p>
+
+        <div class="bg-white/60 rounded-xl p-5 space-y-3">
+          <h3 class="font-medium text-slate-900">What to expect:</h3>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-start">
+              <svg class="w-5 h-5 text-violet-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <span><strong>We ask, you discover</strong> &mdash; The questions help you explore your own thoughts, not get our answers</span>
+            </li>
+            <li class="flex items-start">
+              <svg class="w-5 h-5 text-violet-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+              </svg>
+              <span><strong>Your words matter</strong> &mdash; We reflect your exact words back to you</span>
+            </li>
+            <li class="flex items-start">
+              <svg class="w-5 h-5 text-violet-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span><strong>There's no "right" answer</strong> &mdash; This is exploration, not a test</span>
+            </li>
+            <li class="flex items-start">
+              <svg class="w-5 h-5 text-violet-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span><strong>Feeling uncertain is okay</strong> &mdash; The process works even when it feels strange at first</span>
+            </li>
+          </ul>
+        </div>
+
+        <p class="text-sm text-slate-600 italic">
+          The questions may feel unusual &mdash; they're designed that way. Just respond naturally with whatever comes to mind.
+        </p>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-violet-100">
+        <p class="text-sm text-slate-600">
+          Want to learn more? <%= link_to "Read about the approach", approach_path, class: "text-violet-600 hover:text-violet-800 underline" %>
+        </p>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="text-center mb-8">
+    <h1 class="text-2xl font-bold text-slate-900 mb-2">
+      <%= @first_time ? "Choose a Space to Step Into" : "Step Into a Space" %>
+    </h1>
+    <p class="text-slate-600">
+      <% if @first_time %>
+        Pick whichever space feels most relevant right now. There's no wrong choice &mdash; you can explore others in future sessions.
+      <% else %>
+        Each space offers a different perspective on your experience.
+      <% end %>
+    </p>
+  </div>
+
+  <!-- Pre-session reminder -->
+  <div class="bg-violet-50 border border-violet-200 rounded-xl p-4 mb-8">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <div class="ml-3 text-sm text-violet-700">
+        <p>Each session explores <strong>one space</strong> and lasts up to <strong>30 minutes</strong>. You can pause at any time.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Space selection grid -->
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+    <% @spaces.each do |space_key, space_info| %>
+      <button type="button"
+              class="space-card group relative bg-white rounded-xl border-2 border-slate-200 p-6 text-left transition-all duration-200 hover:border-violet-300 hover:shadow-md focus:outline-none"
+              data-action="click->space-selection#select"
+              data-space-selection-target="card"
+              data-space="<%= space_key %>">
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center <%= space_color_class(space_key) %>">
+            <%= space_icon(space_key) %>
+          </div>
+          <div class="ml-4 flex-1">
+            <h3 class="font-semibold text-slate-900 group-hover:text-violet-700"><%= space_info[:name] %></h3>
+            <p class="text-sm text-slate-600 mt-1"><%= space_info[:description] %></p>
+          </div>
+        </div>
+        <!-- Selection indicator -->
+        <div class="absolute top-3 right-3 hidden" data-space-selection-target="check" data-space-check="<%= space_key %>">
+          <svg class="w-6 h-6 text-violet-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      </button>
+    <% end %>
+  </div>
+
+  <!-- Start button -->
+  <%= form_with url: journey_sessions_path, method: :post, data: { space_selection_target: "form" } do |f| %>
+    <input type="hidden" name="space" value="" data-space-selection-target="input">
+
+    <div class="flex justify-center">
+      <button type="submit"
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+              data-space-selection-target="submit"
+              disabled>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Begin Session
+      </button>
+    </div>
+  <% end %>
+
+  <!-- Cancel link -->
+  <div class="text-center mt-6">
+    <%= link_to "Cancel", dashboard_path, class: "text-sm text-slate-500 hover:text-slate-700" %>
+  </div>
+
+  <!-- Reminder -->
+  <div class="mt-8">
+    <%= render "shared/disclaimer" %>
+  </div>
+</div>
