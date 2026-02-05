@@ -22,6 +22,17 @@ if ENV['SENTRY_DSN'].present?
       0.1
     end
 
+    # Filter out health check endpoint from profiling
+    config.profiles_sampler = lambda do |sampling_context|
+      transaction_context = sampling_context[:transaction_context]
+      transaction_name = transaction_context[:name]
+
+      return 0.0 if transaction_name&.include?("/up")
+
+      # Fall back to profiles_sample_rate for other transactions
+      nil
+    end
+
     # Add data like request headers and IP for users,
     # see https://docs.sentry.io/platforms/ruby/data-management/data-collected/ for more info
     config.send_default_pii = true
