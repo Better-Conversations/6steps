@@ -38,7 +38,11 @@ Rails.application.configure do
   config.action_mailer.perform_caching = false
 
   # Set localhost to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+  # Can override via APPLICATION_HOST/APPLICATION_PORT environment variables.
+  config.action_mailer.default_url_options = {
+    host: ENV.fetch("APPLICATION_HOST", "localhost"),
+    port: ENV.fetch("APPLICATION_PORT", 3000)
+  }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

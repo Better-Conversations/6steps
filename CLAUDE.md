@@ -6,15 +6,15 @@
 
 This application is subject to UK/EU GDPR and designed to avoid EU AI Act classification. The following changes **REQUIRE compliance review before implementation**:
 
-| Change Type | Risk Level | Action Required |
-|-------------|------------|-----------------|
-| Adding AI/ML components | **CRITICAL** | Full EU AI Act assessment required |
-| Modifying `SafetyMonitor` patterns | **HIGH** | Safety review + exhaustive testing |
-| Changing depth thresholds | **HIGH** | Safety review + documentation |
-| Adding new data collection | **HIGH** | DPO review for GDPR impact |
-| Modifying consent types | **HIGH** | Legal review |
-| Changing data retention | **MEDIUM** | DPO review |
-| Adding health/therapeutic claims | **CRITICAL** | Medical device regulation risk |
+| Change Type                        | Risk Level   | Action Required                    |
+| ---------------------------------- | ------------ | ---------------------------------- |
+| Adding AI/ML components            | **CRITICAL** | Full EU AI Act assessment required |
+| Modifying `SafetyMonitor` patterns | **HIGH**     | Safety review + exhaustive testing |
+| Changing depth thresholds          | **HIGH**     | Safety review + documentation      |
+| Adding new data collection         | **HIGH**     | DPO review for GDPR impact         |
+| Modifying consent types            | **HIGH**     | Legal review                       |
+| Changing data retention            | **MEDIUM**   | DPO review                         |
+| Adding health/therapeutic claims   | **CRITICAL** | Medical device regulation risk     |
 
 **DO NOT** implement any of the above without explicit authorization.
 
@@ -47,6 +47,7 @@ Six Steps is a Rails 8.0+ application offering quiet spaces for self-reflection,
 ### Safety-First Design
 
 The SafetyMonitor service (`app/services/safety_monitor.rb`) uses DETERMINISTIC pattern matching, not AI:
+
 - All crisis detection is via regex patterns
 - Depth scores are calculated from word counts
 - This ensures testable, auditable, predictable behaviour
@@ -69,51 +70,47 @@ The SafetyMonitor service (`app/services/safety_monitor.rb`) uses DETERMINISTIC 
 
 ## Development Environment
 
-**IMPORTANT:** Always use the devcontainer for running Rails commands. The host machine may have a different Ruby version.
-
-Start the devcontainer from VS Code or Cursor first (use "Reopen in Container"). Once running, execute commands via docker.
-
-**Note:** The container name may vary (e.g., `devcontainer-app-1` vs `six-steps_devcontainer-app-1`). Use `docker ps --filter "name=devcontainer"` to find the correct name.
+**IMPORTANT:** Claude Code runs inside the devcontainer. Run commands directly — do NOT use `docker exec`. The `docker` command is not available inside the container.
 
 ```bash
-# Run commands inside the devcontainer
-docker exec <container> <command>
-
-# Examples:
-docker exec <container> bin/rails db:migrate
-docker exec <container> bin/rails console
+# Run commands directly — you are already inside the devcontainer
+bin/rails db:migrate
+bin/rails console
 
 # IMPORTANT: Always set RAILS_ENV=test when running tests
 # The devcontainer defaults to RAILS_ENV=development
-docker exec -e RAILS_ENV=test <container> bundle exec rspec
+RAILS_ENV=test bundle exec rspec
 ```
 
 ## Testing
 
 ### Run smoke tests first (quick integration check):
+
 ```bash
-docker exec -e RAILS_ENV=test <container> bin/rails smoke_test:all
+RAILS_ENV=test bin/rails smoke_test:all
 ```
 
 ### Run safety tests (critical):
+
 ```bash
-docker exec -e RAILS_ENV=test <container> bundle exec rspec spec/services/safety_monitor_spec.rb
+RAILS_ENV=test bundle exec rspec spec/services/safety_monitor_spec.rb
 ```
 
 ### Run all tests:
+
 ```bash
-docker exec -e RAILS_ENV=test <container> bundle exec rspec
+RAILS_ENV=test bundle exec rspec
 ```
 
 ## Commands
 
 ```bash
-docker exec <container> bin/rails db:migrate           # Run migrations
-docker exec <container> bin/rails server               # Start dev server
-docker exec -e RAILS_ENV=test <container> bundle exec rspec   # Run tests
-docker exec <container> bin/rails console              # Rails console
-docker exec -e RAILS_ENV=test <container> bin/rails smoke_test:all # Integration smoke tests
-docker exec <container> bin/rails db:encryption:init   # Generate encryption keys (if needed)
+bin/rails db:migrate                              # Run migrations
+bin/rails server                                  # Start dev server
+RAILS_ENV=test bundle exec rspec                  # Run tests
+bin/rails console                                 # Rails console
+RAILS_ENV=test bin/rails smoke_test:all           # Integration smoke tests
+bin/rails db:encryption:init                      # Generate encryption keys (if needed)
 ```
 
 ## Important Notes
@@ -133,6 +130,7 @@ docker exec <container> bin/rails db:encryption:init   # Generate encryption key
 ### Invite System
 
 Public registration is disabled. Users can only register with a valid invite link:
+
 - Invites created by admins at `/admin/invites`
 - Invite URL format: `/users/sign_up?invite=TOKEN`
 - **Single-use invites**: Default, one person per invite, optional email restriction
@@ -163,17 +161,18 @@ bin/rails runner 'User.find_by(email: "user@example.com").update!(role: :admin)'
 
 The following files have regulatory implications - modifications require compliance review:
 
-| File | Compliance Area |
-|------|-----------------|
-| `app/services/safety_monitor.rb` | Crisis detection - user safety |
-| `app/jobs/data_retention_job.rb` | GDPR data minimization |
-| `app/models/consent.rb` | GDPR lawful basis |
-| `app/controllers/users/registrations_controller.rb` | GDPR data portability/erasure |
-| `config/locales/*.yml` | "Not professional support" disclaimers |
+| File                                                | Compliance Area                        |
+| --------------------------------------------------- | -------------------------------------- |
+| `app/services/safety_monitor.rb`                    | Crisis detection - user safety         |
+| `app/jobs/data_retention_job.rb`                    | GDPR data minimization                 |
+| `app/models/consent.rb`                             | GDPR lawful basis                      |
+| `app/controllers/users/registrations_controller.rb` | GDPR data portability/erasure          |
+| `config/locales/*.yml`                              | "Not professional support" disclaimers |
 
 ## Why No AI
 
 The system deliberately uses **deterministic rule-based processing** to:
+
 1. Avoid EU AI Act High-Risk classification (Annex III, Section 5)
 2. Ensure fully auditable, predictable behaviour
 3. Enable exhaustive safety testing
@@ -189,12 +188,13 @@ If AI features are ever considered, see `COMPLIANCE.md` Section 4 for mandatory 
 2. Branch naming: `username/BCTT-XXX-short-description`
 3. Commit frequently with meaningful messages
 4. Don't commit to main directly
+5. **YOU MUST** Make sure `bin/brakeman --no-pager` and `bin/importmap audit` and `bin/rubocop -f github` all pass before committing.
 
 ### Implementation Steps
 
 When adding features that modify models, follow this pattern:
 
-1. **Migration**: Generate with `docker exec devcontainer-app-1 bin/rails generate migration ...`
+1. **Migration**: Generate with `bin/rails generate migration ...`
 2. **Model**: Update model with scopes, validations, and instance methods
 3. **Controller**: Update permitted params if adding new fields
 4. **Views**: Update admin views (index, show, new/edit forms)
@@ -209,6 +209,7 @@ Stimulus controllers are auto-loaded from `app/javascript/controllers/`. Name fi
 ### Factories
 
 Use traits to represent different object states:
+
 ```ruby
 trait :multi_use do
   multi_use { true }
@@ -221,12 +222,12 @@ end
 
 ## Documentation
 
-| Document | Purpose |
-|----------|---------|
-| [README.md](README.md) | Quick start and overview |
-| [COMPLIANCE.md](COMPLIANCE.md) | Regulatory requirements (GDPR, EU AI Act) |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design and data flow |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Hosting and deployment |
-| [docs/ADMINISTRATION.md](docs/ADMINISTRATION.md) | User roles and management |
-| [docs/TESTING.md](docs/TESTING.md) | Test commands and categories |
-| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common issues and solutions |
+| Document                                           | Purpose                                   |
+| -------------------------------------------------- | ----------------------------------------- |
+| [README.md](README.md)                             | Quick start and overview                  |
+| [COMPLIANCE.md](COMPLIANCE.md)                     | Regulatory requirements (GDPR, EU AI Act) |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)       | System design and data flow               |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)           | Hosting and deployment                    |
+| [docs/ADMINISTRATION.md](docs/ADMINISTRATION.md)   | User roles and management                 |
+| [docs/TESTING.md](docs/TESTING.md)                 | Test commands and categories              |
+| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common issues and solutions               |

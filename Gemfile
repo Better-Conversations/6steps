@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.0.4"
+gem "rails", "~> 8.1.2"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record
@@ -39,6 +39,7 @@ gem "prawn"
 gem "prawn-table"
 gem "matrix"  # Required by prawn for Ruby 3.1+
 gem "gemoji"  # For emoji short code lookup in PDF export
+gem "ostruct" # Ruby 3.5+ removes ostruct from default gems
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -81,3 +82,6 @@ end
 
 gem "sentry-ruby"
 gem "sentry-rails"
+
+# Email delivery via Postmark
+gem "postmark-rails"

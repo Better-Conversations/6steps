@@ -2,114 +2,56 @@
 
 A Rails application offering quiet spaces for self-reflection, using the Six Spaces technique inspired by David Grove's Emergent Knowledge.
 
-**Six Steps is a tool for structured self-reflection.** It is not intended as a substitute for professional coaching, counselling, or therapy. Safety guardrails are included due to the origins of Clean Language techniques in therapeutic settings.
+Six Steps is a Rails 8.0+ application offering quiet spaces for self-reflection, using the Six Spaces technique inspired by David Grove's Emergent Knowledge. This is a tool for structured self-reflection - it is not intended as a substitute for professional coaching, counselling, or therapy.
 
-## Quick Start
+## Quick Start using Docker
 
-```bash
-# Clone and setup
-git clone https://github.com/amphora/six-steps.git
-cd six-steps
-bundle install
+If you'd just like to try the application you can do so using Docker Compose.
 
-# Database setup
-bin/rails db:create db:migrate
+1. Install the latest version of [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+2. Download the `docker-compose.yml` from this repository to your local machine
+3. Run `docker compose up` in the same directory
+4. Wait for all services to start (the database health check will complete first)
 
-# Run tests to verify setup
-bundle exec rspec
+Once running, access the application at:
 
-# Start development server
-bin/rails server
-```
+| Service | URL | Description |
+|---------|-----|-------------|
+| Web App | http://localhost | Main application |
+| Mailpit | http://localhost:8025 | Email capture UI - view all sent emails here |
 
-## First-Time Setup
+The default admin credentials (created on first run) are:
+- Email: `admin@localhost`
+- Password: `change_me_immediately`
 
-### 1. Setup Encryption Keys
+To stop the application, press `Ctrl+C` or run `docker compose down`.
 
-```bash
-bin/rails db:encryption:init
-EDITOR=vim bin/rails credentials:edit
-```
+The `docker-compose.yml` includes sensible defaults for local testing. For production deployment, see the "Hosting this yourself" section below.
 
-Add the generated keys under `active_record_encryption`:
+## Developing
 
-```yaml
-active_record_encryption:
-  primary_key: <generated_key>
-  deterministic_key: <generated_key>
-  key_derivation_salt: <generated_salt>
-```
+If you want to develop/extend the application:
 
-### 2. Create First Admin User
+- Fork the repository on GitHub
+- Clone the repository to your local machine
+- Open in Dev Container (e.g. VS Code or Cursor)
+- Claude code is installed in the container for your AI assistant needs
+- Enjoy!
+- We welcome contributions to the project by raising issues, feature requests, or pull requests.
 
-Since registration is invite-only, create the first user via console:
+## Hosting this yourself
 
-```bash
-bin/rails console
-```
+You're welcome to host this yourself. Start from the `docker-compose.yml` file and:
 
-```ruby
-user = User.new(
-  email: "admin@example.com",
-  password: "your_secure_password",
-  password_confirmation: "your_secure_password",
-  region: :uk,  # or :us, :eu, :au
-  role: :admin
-)
-user.save(validate: false)  # Skip invite validation for bootstrap
-```
-
-### 3. Verify Setup
-
-```bash
-bin/rails smoke_test:all
-# You should see: "All smoke tests passed!"
-```
-
-## Requirements
-
-- Ruby 3.2+
-- Rails 8.0+
-- PostgreSQL 15+
-- Node.js 18+ (for Tailwind CSS compilation)
-
-## Features
-
-- **Six Spaces Technique**: Step into quiet spaces for reflection (Here, There, Before, After, Inside, Outside)
-- **Bounded Sessions**: One space per session, 30-minute time limit
-- **Safety System**: Deterministic crisis detection with grounding interventions
-- **Region-Aware Resources**: Crisis helplines for UK, US, EU, AU
-- **GDPR Compliant**: Consent management, 30-day data retention, right to erasure
-- **Session Oversight**: Admin dashboard for anonymized session review
-- **Invite-Only Access**: Secure invite system for controlled user registration
-- **Audit Trail**: Full PaperTrail versioning on sensitive models
-
-## Documentation
-
-| Document | Description |
-|----------|-------------|
-| [Architecture](docs/ARCHITECTURE.md) | System design, services, and data flow |
-| [Administration](docs/ADMINISTRATION.md) | User roles, invites, and management |
-| [Testing](docs/TESTING.md) | Test commands and categories |
-| [Troubleshooting](docs/TROUBLESHOOTING.md) | Common issues and solutions |
-| [Deployment](docs/DEPLOYMENT.md) | Hosting and infrastructure |
-| [Compliance](COMPLIANCE.md) | GDPR, EU AI Act, regulatory requirements |
-| [Claude Guide](CLAUDE.md) | AI assistant guidance |
-
-## Common Commands
-
-```bash
-bin/rails server              # Start dev server
-bundle exec rspec             # Run all tests
-bin/rails smoke_test:all      # Quick integration check
-bin/rails console             # Rails console
-```
-
-## Regulatory Compliance
-
-This application handles sensitive personal data and must comply with UK/EU GDPR. The system uses **deterministic pattern matching** (not AI) to avoid EU AI Act High-Risk classification.
-
-See [COMPLIANCE.md](COMPLIANCE.md) for full requirements.
+- Generate secure values for `RAILS_MASTER_KEY`, `SECRET_KEY_BASE`, and the encryption keys
+- Set `FORCE_SSL=true` and configure your SSL termination (reverse proxy)
+- Set `APPLICATION_HOST` to your domain and `APPLICATION_PROTOCOL=https`
+- For email delivery, either:
+  - Remove `SMTP_ADDRESS` and `SMTP_PORT`, then set `POSTMARK_API_TOKEN` for Postmark delivery, or
+  - Configure `SMTP_ADDRESS` and `SMTP_PORT` for your own SMTP server
+- Optionally set `SENTRY_DSN` for error monitoring
+- Optionally set `UMAMI_WEBSITE_ID` for privacy-friendly analytics via [Umami](https://umami.is)
+- Update the admin bootstrap credentials (`ADMIN_EMAIL`, `ADMIN_PASSWORD`)
 
 ## License
 

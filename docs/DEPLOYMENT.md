@@ -6,129 +6,85 @@
 
 ## Quick Reference
 
-| Item | Value |
-|------|-------|
-| Stack | Rails 8.0+, PostgreSQL, Solid Queue |
-| Ruby | 3.4.4 |
-| Deployment | GitHub Actions → GHCR → Docker |
-| SSL | Required (TLS 1.3) |
-| Encryption | AES-256 via Rails credentials |
-| Web Server | Thruster (built into container) |
+| Item       | Value                               |
+| ---------- | ----------------------------------- |
+| Stack      | Rails 8.1+, PostgreSQL, Solid Queue |
+| Ruby       | 3.4.4                               |
+| Deployment | GitHub Actions → GHCR → Docker      |
+| SSL        | Required (TLS 1.3)                  |
+| Encryption | AES-256 via Rails credentials       |
+| Web Server | Thruster (built into container)     |
 
 ---
 
-## 1. Deployment Process
+## Environment Variables
 
-**Note:** Deployment commands are for humans only. AI agents should direct users to read this file.
+### Core Rails Variables
 
-### Deploy a New Version
+| Variable                   | Required | Default           | Description                                                                          |
+| -------------------------- | -------- | ----------------- | ------------------------------------------------------------------------------------ |
+| `RAILS_ENV`                | Yes      | -                 | Environment (production, development, test)                                          |
+| `RAILS_MASTER_KEY`         | Yes\*    | -                 | Decrypts Rails credentials. _Not required if using `ACTIVE*RECORD_ENCRYPTION*_` vars |
+| `DATABASE_URL`             | No       | Uses database.yml | Full database connection URL (overrides database.yml)                                |
+| `RAILS_SERVE_STATIC_FILES` | No       | false             | Enable static file serving (set to `true` for containerized deployments)             |
+| `RAILS_LOG_TO_STDOUT`      | No       | false             | Log to stdout instead of files                                                       |
+| `RAILS_LOG_LEVEL`          | No       | `info`            | Log level: debug, info, warn, error, fatal                                           |
 
-1. Check code into GitHub and wait for CI Actions to finish
-2. SSH to the server:
-   ```bash
-   ssh apps@sixsteps-common.anteater-catfish.ts.net
-   ```
-3. Change to the app directory:
-   ```bash
-   cd rails-app
-   ```
-4. Refresh the app:
-   ```bash
-   ./refresh.sh
-   ```
+### Web Server (Puma)
 
-This pulls the new Docker image and restarts the server. Database migrations are handled automatically by the container entrypoint.
+| Variable              | Required | Default | Description                                            |
+| --------------------- | -------- | ------- | ------------------------------------------------------ |
+| `PORT`                | No       | `3000`  | HTTP port Puma listens on                              |
+| `RAILS_MAX_THREADS`   | No       | `3`     | Thread count per worker (also sets database pool size) |
+| `WEB_CONCURRENCY`     | No       | `1`     | Number of Puma worker processes                        |
+| `PIDFILE`             | No       | -       | Custom PID file location                               |
+| `SOLID_QUEUE_IN_PUMA` | No       | -       | Set to run Solid Queue supervisor inside Puma          |
 
-### Useful Commands
+### Email (Postmark)
 
-```bash
-# Rails console on server
-docker compose exec web bundle exec rails console
+| Variable               | Required       | Default             | Description                                        |
+| ---------------------- | -------------- | ------------------- | -------------------------------------------------- |
+| `POSTMARK_API_TOKEN`   | **Yes** (prod) | -                   | Postmark API token for email delivery              |
+| `MAILER_FROM_ADDRESS`  | No             | `noreply@localhost` | Default "from" address for emails                  |
+| `APPLICATION_HOST`     | No             | `localhost`         | Host for URLs in emails (e.g., invite links)       |
+| `APPLICATION_PORT`     | No             | -                   | Port for URLs in emails (omit for standard 80/443) |
+| `APPLICATION_PROTOCOL` | No             | `https`             | Protocol for URLs in emails                        |
 
-# View logs
-docker compose logs -f web
+### Encryption
 
-# Check container status
-docker compose ps
-```
+Encryption can be configured via Rails credentials OR environment variables. If using environment variables:
 
----
+| Variable                                       | Required  | Default | Description                                  |
+| ---------------------------------------------- | --------- | ------- | -------------------------------------------- |
+| `ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY`         | **Yes\*** | -       | 32-byte hex key for encrypting data          |
+| `ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY`   | **Yes\*** | -       | 32-byte hex key for deterministic encryption |
+| `ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT` | **Yes\*** | -       | 32-byte hex salt for key derivation          |
 
-## 2. Infrastructure
+\*Required only if not using Rails credentials for encryption keys.
 
-### Current Setup
+### Monitoring
 
-- **Server:** Proxmox VM on Tailscale (`sixsteps-common.anteater-catfish.ts.net`)
-- **User:** `apps`
-- **Database:** PostgreSQL (username/password: sixsteps/sixsteps)
-- **Container Registry:** GitHub Container Registry (ghcr.io)
+| Variable     | Required | Default | Description                                            |
+| ------------ | -------- | ------- | ------------------------------------------------------ |
+| `SENTRY_DSN` | No       | -       | Sentry DSN for error tracking. Omit to disable Sentry. |
 
-### CI/CD Pipeline
+### Admin Bootstrap
 
-1. Push to `main` triggers GitHub Actions
-2. Actions run security scans (Brakeman, importmap audit)
-3. Docker image built and pushed to GHCR
-4. Manual deployment via `refresh.sh` on server
+For initial deployment when no users exist:
 
----
+| Variable         | Required | Default | Description                                         |
+| ---------------- | -------- | ------- | --------------------------------------------------- |
+| `ADMIN_EMAIL`    | No       | -       | Email for initial admin user                        |
+| `ADMIN_PASSWORD` | No       | -       | Password for initial admin (6-128 chars)            |
+| `ADMIN_REGION`   | No       | `uk`    | Region for crisis resources (uk, us, eu, au, other) |
 
-## 3. Compliance Requirements
+These are only used when `User.count == 0` and the app boots. Run `bin/rails admin:create_initial` to create the admin user.
 
-This application handles **sensitive personal data** under UK/EU GDPR. Hosting decisions have regulatory implications.
+### CI/Test Only
 
-### Data Location
-
-| Requirement | Reason |
-|-------------|--------|
-| UK or EU hosting preferred | Simplifies GDPR compliance |
-| If US hosting | Requires Standard Contractual Clauses (SCCs) |
-| Document location in privacy policy | GDPR transparency requirement |
-
-### Encryption Requirements
-
-| Layer | Requirement |
-|-------|-------------|
-| In Transit | TLS 1.3 (mandatory) |
-| At Rest | AES-256 (handled by Rails) |
-| Backups | Must be encrypted |
-| Database | PostgreSQL with encryption at rest |
-
-### Data Processing Agreement (DPA)
-
-You must have a DPA in place with:
-- Hosting provider
-- Any backup service
-- Any monitoring service (if it can access logs)
-
----
-
-## 4. Environment Variables
-
-### Required for Production
-
-```bash
-RAILS_ENV=production
-RAILS_MASTER_KEY=<from credentials>
-DATABASE_URL=postgres://sixsteps:sixsteps@localhost:5432/sixsteps_production
-RAILS_SERVE_STATIC_FILES=true
-RAILS_LOG_TO_STDOUT=true
-```
-
-### Credentials Setup
-
-Encryption keys must be in Rails credentials:
-
-```bash
-EDITOR=vim bin/rails credentials:edit --environment production
-```
-
-Required keys:
-```yaml
-active_record_encryption:
-  primary_key: <32-byte hex>
-  deterministic_key: <32-byte hex>
-  key_derivation_salt: <32-byte hex>
-```
+| Variable | Required | Default | Description                                             |
+| -------- | -------- | ------- | ------------------------------------------------------- |
+| `CI`     | No       | -       | When present, enables eager loading in test environment |
 
 ---
 
@@ -138,9 +94,9 @@ The application uses **Solid Queue** for background processing (database-backed,
 
 ### Required Jobs
 
-| Job | Schedule | Purpose |
-|-----|----------|---------|
-| `DataRetentionJob` | Daily | GDPR data minimization (30-day redaction) |
+| Job                | Schedule | Purpose                                   |
+| ------------------ | -------- | ----------------------------------------- |
+| `DataRetentionJob` | Daily    | GDPR data minimization (30-day redaction) |
 
 ### Running Jobs
 
@@ -149,194 +105,3 @@ Jobs are processed by Solid Queue workers. For scheduled jobs, set up a cron:
 ```cron
 0 2 * * * cd /app && docker compose exec web bin/rails runner 'DataRetentionJob.perform_now' >> /var/log/sixsteps/retention.log 2>&1
 ```
-
----
-
-## 6. Security Hardening
-
-### Server Setup
-
-- [ ] Automatic security updates enabled
-- [ ] UFW firewall configured (ports 22, 80, 443 only)
-- [ ] Fail2ban installed and configured
-- [ ] SSH key authentication only (password auth disabled)
-- [ ] Non-root deployment user
-
-### SSL/TLS
-
-- [ ] TLS 1.3 enforced
-- [ ] HSTS header enabled
-- [ ] SSL certificate auto-renewal
-- [ ] Strong cipher suites only
-
-### Database
-
-- [ ] Database not exposed to public internet
-- [ ] Strong database password
-- [ ] Regular backups (encrypted)
-- [ ] Backup restoration tested
-
----
-
-## 7. Monitoring
-
-### Required Monitoring
-
-| What | Why |
-|------|-----|
-| Uptime | User access to crisis resources |
-| Error rates | Application health |
-| SSL expiry | Security compliance |
-| Disk space | Prevent outages |
-| Failed login attempts | Security |
-
-### Recommended Tools
-
-- **Error tracking:** Sentry (configured in Gemfile)
-- **Uptime:** UptimeRobot, Pingdom
-
-### Log Retention
-
-- Application logs: 30 days minimum
-- Access logs: 30 days minimum
-- Audit logs: Preserved indefinitely (SafetyAuditLog in database)
-
-**Note:** Logs may contain PII - treat as sensitive data.
-
----
-
-## 8. Backup Requirements
-
-### What to Backup
-
-| Item | Frequency | Retention |
-|------|-----------|-----------|
-| PostgreSQL database | Daily | 30 days |
-| Rails credentials | On change | Indefinite (secure location) |
-| SSL certificates | On renewal | Previous version |
-
-### Backup Security
-
-- All backups must be encrypted
-- Store in separate location from primary
-- Test restoration quarterly
-
----
-
-## 9. Data Breach Notification
-
-**CRITICAL:** Under GDPR Article 33, breaches must be reported to the ICO within 72 hours.
-
-### Breach Detection
-
-Monitor for:
-- Unauthorized access attempts (fail2ban alerts)
-- Unusual database queries
-- Unexpected data exports
-- Compromised credentials
-
-### Escalation Process
-
-1. **Detect breach** → Immediately notify Data Controller (Chandima)
-2. **Assess scope** → Determine what data was affected
-3. **Notify ICO** → Within 72 hours if personal data at risk
-4. **Notify users** → If high risk to their rights
-
-### ICO Contact
-
-- **Online:** https://ico.org.uk/for-organisations/report-a-breach/
-- **Phone:** 0303 123 1113
-
----
-
-## 10. Crisis Resource Verification
-
-**User Safety Requirement:** Crisis helpline numbers must be verified quarterly.
-
-### Verification Schedule
-
-| Quarter | Deadline |
-|---------|----------|
-| Q1 | March 31 |
-| Q2 | June 30 |
-| Q3 | September 30 |
-| Q4 | December 31 |
-
-### What to Verify
-
-For each region (UK, US, EU, AU):
-- Primary helpline number works
-- Secondary helpline number works
-- URLs resolve correctly
-- Information is current
-
-**File to update:** `app/services/crisis_resources.rb`
-
-**Any changes require safety review before deployment.**
-
----
-
-## 11. Incident Response
-
-### Severity Levels
-
-| Level | Description | Response Time |
-|-------|-------------|---------------|
-| P1 | Service down, crisis resources unavailable | Immediate |
-| P2 | Major feature broken | 4 hours |
-| P3 | Minor issue | 24 hours |
-| P4 | Enhancement | Scheduled |
-
-### P1 Incident Procedure
-
-1. Restore service (prioritize crisis resources page)
-2. Notify Data Controller immediately
-3. Document incident
-4. Post-incident review within 48 hours
-
----
-
-## 12. Pre-Deployment Checklist
-
-Before every deployment:
-
-```bash
-# Security scan
-bundle exec brakeman
-
-# Compliance tests
-bundle exec rspec spec/compliance/
-
-# Full test suite
-bundle exec rspec
-```
-
-**Do not deploy if any compliance tests fail.**
-
----
-
-## 13. Contact Information
-
-| Role | Contact |
-|------|---------|
-| Data Controller | Chandima |
-| Technical Lead / Hosting | Simon Coles |
-
----
-
-## 14. Outstanding Items
-
-### Before Production (HIGH)
-
-- [ ] Confirm hosting location and update privacy policy
-- [ ] Obtain DPAs from hosting provider
-- [ ] Set up breach notification escalation contacts
-- [ ] Configure crisis resource verification calendar
-
-### Before Public Launch (MEDIUM)
-
-- [ ] Add cookie consent notice
-- [ ] Document all sub-processors in COMPLIANCE.md
-- [ ] Complete international transfer documentation (if applicable)
-
-See `COMPLIANCE.md` for full regulatory requirements.

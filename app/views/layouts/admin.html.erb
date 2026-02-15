@@ -12,6 +12,9 @@
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <% if ENV['UMAMI_WEBSITE_ID'].present? %>
+      <script defer src="https://umami.betterconversations.foundation/script.js" data-website-id="<%= ENV['UMAMI_WEBSITE_ID'] %>"></script>
+    <% end %>
   </head>
 
   <body class="h-full bg-slate-100">

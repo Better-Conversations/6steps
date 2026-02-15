@@ -25,10 +25,11 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
-  config.assume_ssl = true
+  # Allow disabling SSL for local docker testing via FORCE_SSL=false
+  config.assume_ssl = ENV.fetch("FORCE_SSL", "true") == "true"
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  config.force_ssl = ENV.fetch("FORCE_SSL", "true") == "true"
 
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
@@ -60,18 +61,33 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates and invite URLs.
   # Configure via APPLICATION_HOST environment variable.
   config.action_mailer.default_url_options = {
-    host: ENV.fetch("APPLICATION_HOST", "6steps.online"),
-    protocol: "https"
+    host: ENV.fetch("APPLICATION_HOST", "localhost"),
+    port: ENV.fetch("APPLICATION_PORT", nil),
+    protocol: ENV.fetch("APPLICATION_PROTOCOL", "https")
   }
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  # Email delivery - use SMTP if configured, otherwise Postmark
+  if ENV["SMTP_ADDRESS"].present?
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address: ENV.fetch("SMTP_ADDRESS"),
+      port: ENV.fetch("SMTP_PORT", 25)
+    }
+  else
+    postmark_token = ENV["POSTMARK_API_TOKEN"]
+
+    if postmark_token.present?
+      config.action_mailer.delivery_method = :postmark
+      config.action_mailer.postmark_settings = {
+        api_token: postmark_token
+      }
+    elsif ENV["SECRET_KEY_BASE_DUMMY"].present?
+      # Allow asset precompile during image builds without real credentials.
+      config.action_mailer.delivery_method = :test
+    else
+      raise "POSTMARK_API_TOKEN must be set in production when SMTP is not configured"
+    end
+  end
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

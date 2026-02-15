@@ -75,10 +75,10 @@ class SessionPdfExporter
       patterns = all_emoji.flat_map do |e|
         if e.length == 1 || (e.codepoints.length == 1)
           # Single emoji - add pattern with optional skin tone
-          [Regexp.escape(e) + SKIN_TONE_REGEX.source + "?"]
+          [ Regexp.escape(e) + SKIN_TONE_REGEX.source + "?" ]
         else
           # Multi-codepoint sequence - match exactly as-is
-          [Regexp.escape(e)]
+          [ Regexp.escape(e) ]
         end
       end
       Regexp.new("(?:" + patterns.join("|") + ")")
