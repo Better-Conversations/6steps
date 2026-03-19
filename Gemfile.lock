@@ -79,7 +79,7 @@ GEM
       uri (>= 0.13.1)
     ast (2.4.3)
     base64 (0.3.0)
-    bcrypt (3.1.21)
+    bcrypt (3.1.22)
     bigdecimal (3.3.1)
     bindex (0.8.1)
     bootsnap (1.22.0)
@@ -400,7 +400,7 @@ PLATFORMS
 
 DEPENDENCIES
   aasm
-  bcrypt (~> 3.1.7)
+  bcrypt (~> 3.1.22)
   bootsnap
   brakeman
   debug
